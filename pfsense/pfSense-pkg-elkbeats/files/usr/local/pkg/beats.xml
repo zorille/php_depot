@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/*
+ * beats.xml
+ *
+ * part of pfSense (https://www.pfsense.org)
+ * Copyright (c) 2015 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2013 Danilo G. Baio
+ * Copyright (c) 2013 Marcello Coutinho
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+	]]>
+	</copyright>
+	<name>ELK Beats</name>
+	<title>Services: ELK Beats</title>
+	<category>Network</category>
+	<include_file>/usr/local/pkg/beats.inc</include_file>
+	<addedit_string>Beats has been created/modified.</addedit_string>
+	<delete_string>Beats has been deleted.</delete_string>
+	<menu>
+		<name>ELK Beats</name>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=beats.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>elkbeats</name>
+		<rcfile>beats.sh</rcfile>
+		<executable>filebeat</executable>
+		<description>Filebeat Deamon</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>Config</text>
+			<url>/pkg_edit.php?xml=beats.xml&amp;id=0</url>
+			<active />
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>beats_enabled</fieldname>
+			<description>Enable Beats service.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<name>Filebeat Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+			<description>Name of beats.</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Tags</fielddescr>
+			<fieldname>tags</fieldname>
+			<description>
+				<![CDATA[
+The tags of the shipper are included in their own field with each transaction published.<br />
+Example: "service-X", "web-tier"
+				]]>
+			</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Fields to Add</fielddescr>
+			<fieldname>fields</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<rows>2</rows>
+			<cols>25</cols>
+			<description>
+				<![CDATA[
+Optional fields that you can specify to add additional information to the output.<br />
+Example:<br />
+env: staging
+				]]>
+			</description>
+		</field>
+		<field>
+			<name>Prospectors</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Prospectors</fielddescr>
+			<fieldname>prospectors</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<rows>10</rows>
+			<cols>100</cols>
+			<default_value>Ci0gaW5wdXRfdHlwZTogbG9nCiAgcGF0aHM6CiAgICAtIC92YXIvbG9nL3N1cmljYXRhL3N1cmljYXRhX3ZteCovZXZlLmpzb24KICBkb2N1bWVudF90eXBlOiBzdXJpY2F0YQogIHRhZ3M6IFsianNvbiJdCg==</default_value>
+			<description>
+				<![CDATA[
+Each - is a prospector. Most options can be set at the prospector level, so you can use different prospectors for various configurations.<br />
+Below are the prospector specific configurations.<br />
+- input_type: log<br />
+&nbsp&nbspPaths that should be crawled and fetched. Glob based paths.<br />
+&nbsp&nbsppaths:<br />
+&nbsp&nbsp&nbsp- /var/log/*.log<br />
+&nbsp&nbsp&nbsp- c:\programdata\elasticsearch\logs\*<br />
+&nbsp&nbspExclude lines. A list of regular expressions to match. It drops the lines that are matching any regular expression from the list.<br />
+&nbsp&nbsp&nbspexclude_lines: ["^DBG"]<br />
+&nbsp&nbspInclude lines. A list of regular expressions to match. It exports the lines that are matching any regular expression from the list.<br />
+&nbsp&nbsp&nbspinclude_lines: ["^ERR", "^WARN"]<br />
+&nbsp&nbspExclude files. A list of regular expressions to match. Filebeat drops the files that are matching any regular expression from the list. By default, no files are dropped.<br />
+&nbsp&nbsp&nbspexclude_files: [".gz$"]<br />
+&nbsp&nbspOptional additional fields. These field can be freely picked to add additional information to the crawled log files for filtering fields:<br />
+&nbsp&nbsp&nbsplevel: debug<br />
+&nbsp&nbsp&nbspreview: 1<br />
+&nbsp&nbsp### Multiline options<br />
+&nbsp&nbspMutiline can be used for log messages spanning multiple lines. This is common for Java Stack Traces or C-Line Continuation<br />
+&nbsp&nbspThe regexp Pattern that has to be matched. The example pattern matches all lines starting with [<br />
+&nbsp&nbsp&nbspmultiline.pattern: ^\[<br />
+&nbsp&nbspDefines if the pattern set under pattern should be negated or not. Default is false.<br />
+&nbsp&nbsp&nbspmultiline.negate: false<br />
+Match can be set to "after" or "before". It is used to define if lines should be append to a pattern that was (not) matched before or after or as long as a pattern is not matched based on negate.<br />
+&nbsp&nbspNote: After is the equivalent to previous and before is the equivalent to to next in Logstash<br />
+&nbsp&nbsp&nbspmultiline.match: after<br />
+				]]>
+			</description>
+			<required/>
+		</field>
+		<field>
+			<name>ElasticSearch Output</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>ElasticSearch Output</fielddescr>
+			<fieldname>elasticsearchenable</fieldname>
+			<description>Send Beats to ElasticSearch.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Hostname</fielddescr>
+			<fieldname>elasticsearchhostname</fieldname>
+			<description>The ElasticSearch hosts.</description>
+			<type>input</type>
+			<default_value>elasticsearch.josue:10515</default_value>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Protocol</fielddescr>
+			<fieldname>elasticsearchprotocol</fieldname>
+			<description>ElasticSearch web Protocol.</description>
+			<type>select</type>
+			<options>
+				<option><name>HTTP</name><value>HTTP</value></option>
+				<option><name>HTTPS</name><value>HTTPS</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>ElasticSearch Username</fielddescr>
+			<fieldname>elasticsearchusername</fieldname>
+			<description>Basic Authentication.</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>ElasticSearch Password</fielddescr>
+			<fieldname>elasticsearchpassword</fieldname>
+			<description>Basic Authentication.</description>
+			<type>password</type>
+			<size>60</size>
+		</field>
+		<field>
+			<name>Logstash Output</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Logstash Output</fielddescr>
+			<fieldname>logstashenable</fieldname>
+			<description>Send Beats to Logstash.</description>
+			<default_value>on</default_value>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Hostname</fielddescr>
+			<fieldname>logstashhostname</fieldname>
+			<description>The Logstash hosts.</description>
+			<type>input</type>
+			<default_value>logstash.josue:10515</default_value>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Logstash SSL</fielddescr>
+			<fieldname>logstashsslenable</fieldname>
+			<description>Optional SSL. By default is off.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Logstash SSL Certificate Authorities</fielddescr>
+			<fieldname>logstashsslcertificateauthorities</fieldname>
+			<description>List of root certificates for HTTPS server verifications.</description>
+			<type>input</type>
+			<default_value>/etc/pki/root/ca.pem</default_value>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Logstash SSL Client Certificate</fielddescr>
+			<fieldname>logstashsslcertificate</fieldname>
+			<description>Certificate for SSL client authentication.</description>
+			<type>input</type>
+			<default_value>/etc/pki/client/cert.pem</default_value>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Logstash SSL Client Key</fielddescr>
+			<fieldname>logstashsslkey</fieldname>
+			<description>Client Certificate Key.</description>
+			<type>input</type>
+			<default_value>/etc/pki/client/cert.key</default_value>
+			<size>60</size>
+		</field>
+		<field>
+			<name>Filebeat Logging</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Logging To Syslog</fielddescr>
+			<fieldname>loggingtosyslog</fieldname>
+			<description>Enable Logging to Syslog.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Logging To File</fielddescr>
+			<fieldname>loggingtofile</fieldname>
+			<description>Enable Logging to File.</description>
+			<default_value>on</default_value>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Logfile Name</fielddescr>
+			<fieldname>logfile</fieldname>
+			<description>Name of Log File without directory.</description>
+			<type>input</type>
+			<default_value>filebeat</default_value>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Log Level</fielddescr>
+			<fieldname>loglevel</fieldname>
+			<description>Sets log level. The default log level is info.</description>
+			<type>select</type>
+			<default_value>info</default_value>
+			<options>
+				<option><name>Critical</name><value>critical</value></option>
+				<option><name>Error</name><value>error</value></option>
+				<option><name>Warning</name><value>warning</value></option>
+				<option><name>Info</name><value>info</value></option>
+				<option><name>Debug</name><value>debug</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Log Selector</fielddescr>
+			<fieldname>logselector</fieldname>
+			<description>
+				<![CDATA[
+At debug level, you can selectively enable logging only for some components.<br />
+To enable all selectors use ["*"].Examples of other selectors are "beat", "publish", "service".
+				]]>
+			</description>
+			<type>select</type>
+			<default_value>*</default_value>
+			<options>
+				<option><name>All</name><value>*</value></option>
+				<option><name>Beat</name><value>beat</value></option>
+				<option><name>Publish</name><value>publish</value></option>
+				<option><name>Service</name><value>service</value></option>
+			</options>
+			<multiple/>
+		</field>
+		<field>
+			<fielddescr>Rotate Size</fielddescr>
+			<fieldname>rotateeverybytes</fieldname>
+			<description>rotateeverybytes Value.</description>
+			<type>input</type>
+			<default_value>10485760</default_value>
+			<size>20</size>
+		</field>
+		<field>
+			<fielddescr>Keep Rotate Files</fielddescr>
+			<fieldname>keepfiles</fieldname>
+			<description>Number of files you want to keep in history.</description>
+			<type>input</type>
+			<default_value>7</default_value>
+			<size>7</size>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		php_install_beats();
+	</custom_php_install_command>
+	<custom_php_validation_command>
+		validate_input_beats($_POST, $input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_beats();
+	</custom_php_resync_config_command>
+	<custom_php_deinstall_command>
+		php_deinstall_beats();
+	</custom_php_deinstall_command>
+</packagegui>

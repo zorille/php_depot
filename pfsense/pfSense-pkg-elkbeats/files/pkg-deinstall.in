@@ -1,0 +1,4 @@
+#!/bin/sh
+
+/usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
+pkg remove beats-5.3.0

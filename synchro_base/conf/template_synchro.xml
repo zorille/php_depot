@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+
+<mail sort_en_erreur="non" >
+	<to>support-exploitation@societe.com</to>
+</mail>
+	
+<log create_log_file="non" fichier_log_unique="oui">
+	<dossier_log>/tmp</dossier_log>
+	<fichier_log>log_synchro.txt</fichier_log>
+</log>
+
+	
+<sql using="oui">
+	<liste_bases>
+		<sql_entree>
+			<database>base_source</database>
+			<dbhost>hostname_source</dbhost>
+			<dbuser>user</dbuser>
+			<dbpasswd>pwd</dbpasswd>
+		</sql_entree>
+		<sql_sortie>
+			<database>base_destination</database>
+			<dbhost>hostname_destination</dbhost>
+			<dbuser>user_destination</dbuser>
+			<dbpasswd>pwd_destination</dbpasswd>
+		</sql_sortie>
+	</liste_bases>
+</sql>
+
+
+<tables>
+	<IgnoreIP>
+		<requete_entree>select IgnoreIP.uniqKey,IP from IgnoreIP,CustReport where CustReport.active=1 and IgnoreIP.uniqKey=CustReport.uniqKey</requete_entree>
+		<requete_sortie>select Key,IP from IgnoreIP</requete_sortie>
+		<table>IgnoreIP</table>
+	</IgnoreIP>
+	<Options>
+		<requete_entree>select distinct uniqKeyOptions.uniqKey,id_option from uniqKeyOptions,CustReport where CURDATE() BETWEEN date_debut and date_fin and id_option!=5 and uniqKeyOptions.uniqKey=CustReport.uniqKey and CustReport.active=1</requete_entree>
+		<requete_sortie>select Key,OptionID from KeyOptions where OptionID!=5</requete_sortie>
+		<table>KeyOptions</table>
+	</Options>
+	<Optionsid>
+		<requete_entree>select distinct id_option,nom from CustOption</requete_entree>
+		<requete_sortie>select Id,Name from OptionID</requete_sortie>
+		<table>OptionID</table>
+	</Optionsid>
+	<dsf>
+		<requete_entree>select distinct uniqKeyDsf.uniqKey,5 as OptionID from uniqKeyDsf,CustReport where uniqKeyDsf.uniqKey=CustReport.uniqKey and CustReport.active=1</requete_entree>
+		<requete_sortie>select Key,OptionID from KeyOptions where OptionID=5</requete_sortie>
+		<table>KeyOptions</table>
+	</dsf>
+	<V5TrackKeyOption>
+		<requete_entree>select V5TrackKeyOption.uniqKey,PathSwitch,PathPrecision,PostClic,FromOption,DBLifeTime from V5TrackKeyOption,CustReport where V5TrackKeyOption.Key=CustReport.uniqKey and CustReport.active=1</requete_entree>
+		<requete_sortie>select uniqKey,PathSwitch,PathPrecision,PostClic,FromOption,DBLifeTime from V5TrackKeyOption</requete_sortie>
+		<table>V5TrackKeyOption</table>
+	</V5TrackKeyOption>
+	<dsfAdress>
+		<requete_entree>select DsfAddress.uniqKey,DsfAddress.Adress as OptionID from DsfAddress,CustReport where DsfAddress.uniqKey=CustReport.uniqKey and CustReport.active=1</requete_entree>
+		<requete_sortie>select Key,Adress from DsfAdress</requete_sortie>
+		<table>DsfAdress</table>
+	</dsfAdress>
+	<CustUserPref>
+		<requete_entree>select CustUserPref.uniqKey,CustPersonne.email,CASE CustPersonne.lang WHEN 'FR' THEN 'French' WHEN 'EN' THEN 'English' END as Language,CASE rapport_par_email WHEN 1 THEN 1 WHEN 3 THEN 1 WHEN 5 THEN 1 WHEN 7 THEN 1 ELSE 0 END as Daily,CASE rapport_par_email WHEN 2 THEN 1 WHEN 3 THEN 1 WHEN 6 THEN 1 WHEN 7 THEN 1 ELSE 0 END as Weekly,CASE rapport_par_email WHEN 4 THEN 1 WHEN 5 THEN 1 WHEN 6 THEN 1 WHEN 7 THEN 1 ELSE 0 END as Monthly from CustUserPref,CustPersonne,CustUser,CustReport where CustUserPref.userid=CustUser.userid and CustPersonne.personneid=CustUser.personneid and CustUserPref.uniqKey=CustReport.uniqKey and CustUserPref.rapport_par_email!=0 and CustReport.active=1 and CustReport.state='OK' and CustPersonne.email!=''</requete_entree>
+		<requete_entree_secondaire>select Key,Adress,Language,Daily,Weekly,Monthly from ResumeAddress</requete_entree_secondaire>
+		<requete_sortie>select Key,Adress,Language,Daily,Weekly,Monthly from ResumeAdress</requete_sortie>
+		<table>ResumeAdress</table>
+	</CustUserPref>
+	<URL>
+		<requete_entree>select uniqKey,SUBSTRING(IF(STRCMP(url,''),url,'non_defini'),1,100) as URL from CustReport where CustReport.active=1</requete_entree>
+		<requete_sortie>select Key,URL from KeyURL</requete_sortie>
+		<table>KeyURL</table>
+	</URL>
+	<Name>
+		<requete_entree>select uniqKey,name from CustReport where CustReport.active=1</requete_entree>
+		<requete_sortie>select Key,Name from KeyNames</requete_sortie>
+		<table>KeyNames</table>
+	</Name>
+	<PerimeterID>
+		<requete_entree>select uniqKeyDsf.uniqKey,dsf_id from uniqKeyDsf,CustReport where CustReport.active=1 and CustReport.uniqKey=uniqKeyDsf.uniqKey</requete_entree>
+		<requete_sortie>select Key,Id from KeyPerimeterID</requete_sortie>
+		<table>KeyPerimeterID</table>
+	</PerimeterID>
+	<resource_usage>
+		<requete_entree>select uniqKey from CustReport where active=1</requete_entree>
+		<requete_sortie>select uniqKey from KeyRessourceUsage</requete_sortie>
+		<table>KeyRessourceUsage</table>
+	</resource_usage>
+	<uniqKey_actif>
+		<requete_entree>select uniqKey,"TRUE" from CustReport where active=1</requete_entree>
+		<requete_sortie>select Key,Active from V5Key</requete_sortie>
+		<table>V5Key</table>
+	</uniqKey_actif>
+	<Custmet>
+		<requete_entree>select ID_INTEGER,CONCAT_WS(".",ID_INTEGER,uniqKey) FROM CustmetKey</requete_entree>
+		<requete_sortie>select CustmetGroupId,Key from CustmetKey</requete_sortie>
+		<table>CustmetKey</table>
+	</Custmet>
+	<CustmetGroup>
+		<requete_entree>SELECT ID_INTEGRE,name,url,"TRUE",type as active FROM generCustmet where ACTIF=1</requete_entree>
+		<requete_sortie>select Id,Name,URL,Active,Type from CustmetGroup</requete_sortie>
+		<table>CustmetGroup</table>
+	</CustmetGroup>
+	<cmclient>
+		<requete_entree>select uniqKey,cmclient from CustReport where active=1 and cmclient!=''</requete_entree>
+		<requete_sortie>select uniqKey,cmclient from CusterCMClient</requete_sortie>
+		<table>CusterCMClient</table>
+	</cmclient>
+	<cumulAccount>
+		<requete_entree>select master_uniqKey,ActiveKey.uniqKey as uniqKey from (select * from CumulAccount join CustReport on CustReport.uniqKey=CumulAccount.master_uniqKey where CustReport.active=1) as ActiveKey join CustReport on CustReport.uniqKey=ActiveKey.uniqKey where CustReport.active=1</requete_entree>
+		<requete_sortie>select master_uniqKey,uniqKey from CumulAccount</requete_sortie>
+		<table>CumulAccount</table>
+	</cumulAccount>
+	<KeyTypes>
+		<requete_entree>select distinct uniqKey,compte from CustReport,CustClient where CustReport.clientid=CustClient.clientid and CustReport.clientid in (select distinct clientid from CustClient)</requete_entree>
+		<requete_sortie>select Key,Compte from KeyTypes</requete_sortie>
+		<table>KeyTypes</table>
+	</KeyTypes>
+	<CSKey>
+		<requete_entree>select master,cs,cs_readable,uniqKey from CSKey</requete_entree>
+		<requete_sortie>select master,cs,cs_readable,uniqKey from CSKey</requete_sortie>
+		<table>CSKey</table>
+	</CSKey>
+	<KeyTranslation>
+		<requete_entree>select old_uniqKey,new_uniqKey from KeyTranslation</requete_entree>
+		<requete_sortie>select old_uniqKey,new_uniqKey from KeyTranslation</requete_sortie>
+		<table>KeyTranslation</table>
+	</KeyTranslation>
+	<Func>
+		<requete_entree>select distinct uniqKeyOptions.uniqKey from CustReport,uniqKeyOptions where uniqKeyOptions.id_option=4 and ( date_fin>=CURDATE() or date_fin is null ) and CustReport.active=1 and CustReport.uniqKey=uniqKeyOptions.uniqKey</requete_entree>
+		<requete_sortie>select uniqKey from FuncKeyRessourceUsage</requete_sortie>
+		<table>FuncKeyRessourceUsage</table>
+	</Func>
+</tables>
+</xml>

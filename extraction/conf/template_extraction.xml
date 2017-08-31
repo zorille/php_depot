@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+<date_debut>20070803</date_debut> <!-- optionnel -->
+<date_fin>20070823</date_fin> <!-- optionnel -->
+<dossier_rapport>/OUTPUT/Stats</dossier_rapport> <!-- optionnel -->
+<fonctions_client>./lib/client/fonctions_client.php</fonctions_client> <!-- optionnel -->
+
+<serial_liste>
+        <serial>789456123</serial>
+</serial_liste>
+
+<mail sort_en_erreur="non" using="non">
+	<to>zorille@client.com</to>
+	<from>noreply@client.com</from>
+</mail>
+
+<!-- Les noms des champs doivent etre uniques -->
+<sql type="sqlite">
+        <requetelist>
+		<requete>select champ1,champ2,champ3 from table1;</requete>
+        </requetelist>
+</sql>
+
+<algorythme algo_serials="non" algo_dates="oui">
+
+	<algo1 type="date">
+		<champ>champ2</champ>
+		<operateur>+</operateur>
+	</algo1>	
+	<algo2 type="date">
+		<champ>champ3</champ>
+		<operateur>+</operateur>
+	</algo2>
+	<algo4 type="serial">
+		<champ>algo2</champ>
+		<operateur>+</operateur>
+	</algo4>
+	<algo3 type="unitaire">
+		<champ>champ1</champ>
+	</algo3>
+	<algo6 type="unitaire">
+		<champ>algo1</champ>
+		<champ>algo2</champ>
+		<operateur>+</operateur>
+	</algo6>
+</algorythme>
+
+
+<fichier affiche_date="oui/non" ajouter="oui/non" type="unique/multi">
+	<nom>client_export</nom> <!--facultatif-->
+	<extension>.csv</extension>
+	<repertoire>/home/dvargas/scripts/extraction/export</repertoire> <!--facultatif-->
+</fichier>
+
+<ordre_de_sortie separateur=";" ajoute_date="non">
+	<champ>
+		<titre>Nom1</titre>
+		<nom_algo>algo1</nom_algo>
+	</champ>
+	<champ>
+		<titre>Nom2</titre>
+		<nom_algo>algo2</nom_algo>
+	</champ>
+	<champ>
+		<titre>Nom3</titre>
+		<nom_algo>algo6</nom_algo>
+	</champ>
+</ordre_de_sortie>
+
+</xml>

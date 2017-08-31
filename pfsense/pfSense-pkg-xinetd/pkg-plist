@@ -1,0 +1,6 @@
+pkg/xinetd.xml
+pkg/xinetd.inc
+www/shortcuts/pkg_xinetd.inc
+/etc/inc/priv/xinetd.priv.inc
+%%DATADIR%%/info.xml
+@dir /etc/inc/priv

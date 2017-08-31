@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/*
+ * dante.xml
+ *
+ * part of pfSense (https://www.pfsense.org)
+ * Copyright (c) 2015 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2013 Danilo G. Baio
+ * Copyright (c) 2013 Marcello Coutinho
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+	]]>
+	</copyright>
+	<name>dante</name>
+	<title>Services: Dante</title>
+	<category>Network</category>
+	<include_file>/usr/local/pkg/dante.inc</include_file>
+	<addedit_string>Dante has been created/modified.</addedit_string>
+	<delete_string>Dante has been deleted.</delete_string>
+	<menu>
+		<name>Dante</name>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=dante.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>dante</name>
+		<rcfile>dante.sh</rcfile>
+		<executable>sockd</executable>
+		<description>Dante Proxy Deamon</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>Main Config</text>
+			<url>/pkg_edit.php?xml=dante.xml&amp;id=0</url>
+			<active />
+			<tab_level>0</tab_level>
+		</tab>
+	</tabs>
+	<advanced_options>enabled</advanced_options>
+	<fields>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>dante_enabled</fieldname>
+			<description>Enable Dante service.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<name>Dante Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Internal Interfaces</fielddescr>
+			<fieldname>internalinterfaces</fieldname>
+			<default_value>opt1</default_value>
+			<description>Select the internal interfaces, such as LAN, where Dante listen</description>
+			<type>interfaces_selection</type>
+			<showvirtualips/>
+			<showips/>
+			<multiple/>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Listen Port</fielddescr>
+			<fieldname>listenport</fieldname>
+			<default_value>1080</default_value>
+			<description>Listen port for connections to Dante</description>
+			<type>input</type>
+			<size>5</size>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>External Interfaces</fielddescr>
+			<fieldname>externalinterfaces</fieldname>
+			<default_value>lan</default_value>
+			<description>Select the external interfaces, such as Wan, where Dante listen</description>
+			<type>interfaces_selection</type>
+			<showvirtualips/>
+			<showips/>
+			<multiple/>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>External Rotation</fielddescr>
+			<fieldname>externalrotation</fieldname>
+			<default_value>none</default_value>
+			<options>
+				<option><name>None</name><value>none</value></option>
+				<option><name>Route</name><value>route</value></option>
+				<option><name>Same-Same</name><value>same-same</value></option>
+			</options>
+			<cols>3</cols>
+			<description>
+				<![CDATA[
+If more than one external address is given, this governs which of the given addresses is selected as the source address for a given outgoing connections/packet. Note that regardless of what sort of external rotation you use, all addresses you want to choose from must be listed via the external keyword first.<br />
+Valid values are none (the default), route, and same-same.<br /> 
+none indicates the first address on the list of external addresses should be used.<br /> 
+<br />
+route indicates the kernels routing table should be consulted to find out what the source address for a given destination will be, and might require you to set user.privileged to root. Note that route might create problems for ftp-clients using active ftp if the Dante bind extension is enabled for the ftp-client.<br /> 
+<br />
+same-same indicates the source address for a given destination should be the same address as the Dante server accepted the client's connection on. 
+				]]>
+			</description>
+			<type>select</type>
+			<required/>
+		</field>
+		<field>
+			<name>Dante Client Pass</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Client Pass</fielddescr>
+			<fieldname>clientpass</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<default_value></default_value>
+			<rows>15</rows>
+			<cols>75</cols>
+			<description>
+				<![CDATA[
+The "client" rules.  All our clients come from the net 10.0.0.0/8.<br />
+<br />
+Allow our clients, also provides an example of the port range command.<br />
+client pass {<br />
+        from: 10.0.0.0/8 port 1-65535 to: 0.0.0.0/0<br />
+        clientmethod: rfc931 # match all idented users that also are in passwordfile<br />
+}<br />
+<br />
+This is identical to above, but allows clients without a rfc931 (ident) too.  In practice this means the socks server will try to get a rfc931 reply first (the above rule), if that fails, it tries this rule.<br />
+client pass {<br />
+        from: 10.0.0.0/8 port 1-65535 to: 0.0.0.0/0<br />
+}<br />
+				]]>
+			</description>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Client Block</fielddescr>
+			<fieldname>clientblock</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<default_value></default_value>
+			<rows>15</rows>
+			<cols>75</cols>
+			<description>
+				<![CDATA[
+Drop everyone else as soon as we can and log the connect, they are not on our net and have no business connecting to us.  This is the default but if you give the rule yourself, you can specify details.<br />
+client block {<br />
+        from: 0.0.0.0/0 to: 0.0.0.0/0<br />
+        log: connect error<br />
+}<br />
+The rules controlling what clients are allowed what requests<br />
+<br />
+you probably don't want people connecting to loopback addresses, who knows what could happen then.<br />
+socks block {<br />
+        from: 0.0.0.0/0 to: lo0<br />
+        log: connect error<br />
+}<br />
+				]]>
+			</description>
+		</field>
+		<field>
+			<name>Dante Socks Pass</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Socks Pass</fielddescr>
+			<fieldname>sockspass</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<default_value></default_value>
+			<rows>15</rows>
+			<cols>75</cols>
+			<description>
+				<![CDATA[
+The rules controlling what sockss are allowed what requests<br />
+Pass any http connects to the example.com domain if they authenticate with username.<br />
+socks pass {<br />
+        from: 10.0.0.0/8 to: 0.0.0.0/0 port = http<br />
+        log: connect error<br />
+        clientmethod: username<br />
+}<br />
+Everyone from our internal network, 10.0.0.0/8 is allowed to use tcp and udp for everything else.<br />
+socks pass {<br />
+        from: 10.0.0.0/8 to: 0.0.0.0/0<br />
+        protocol: tcp udp<br />
+}<br />
+				]]>
+			</description>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Socks Block</fielddescr>
+			<fieldname>socksblock</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<default_value></default_value>
+			<rows>15</rows>
+			<cols>75</cols>
+			<description>
+				<![CDATA[
+Last line, block everyone else.  This is the default but if you provide one  yourself you can specify your own logging/actions<br />
+socks block {<br />
+        from: 0.0.0.0/0 to: 0.0.0.0/0<br />
+        log: connect error<br />
+}<br />
+You probably don't want people connecting to loopback addresses, who knows what could happen then.<br />
+socks block {<br />
+        from: 0.0.0.0/0 to: lo0<br />
+        log: connect error<br />
+}<br />
+				]]>
+			</description>
+		</field>
+		<field>
+			<name>Dante Route</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Socks Route</fielddescr>
+			<fieldname>socksroute</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<default_value></default_value>
+			<rows>15</rows>
+			<cols>100</cols>
+			<description>
+				<![CDATA[
+Route all http connects via an upstream socks server, aka "server-chaining"<br />
+route {<br />
+ from: 10.0.0.0/8 to: 0.0.0.0/0 port = http via: socks.example.net port = socks<br />
+}<br />
+				]]>
+			</description>
+		</field>
+		<field>
+			<fielddescr>Source Host</fielddescr>
+			<fieldname>dantesrchost</fieldname>
+			<description>Enable Source Host DNS Validation (nodnsunknown nodnsmismatch).</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Output Log Method Rotation</fielddescr>
+			<fieldname>danteoutputmethod</fieldname>
+			<default_value>stderr</default_value>
+			<options>
+				<option><name>Syslog</name><value>syslog</value></option>
+				<option><name>Stdout</name><value>stdout</value></option>
+				<option><name>Stderr</name><value>stderr</value></option>
+			</options>
+			<cols>3</cols>
+			<description>
+				<![CDATA[
+the server will log both via syslog, to stdout and to /var/log/dante_pfsense/sockd.log
+				]]>
+			</description>
+			<type>select</type>
+			<multiple/>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Output Log File</fielddescr>
+			<fieldname>dantelogoutput</fieldname>
+			<default_value>sockd.log</default_value>
+			<description>Log File Name</description>
+			<type>input</type>
+			<size>20</size>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Client Method</fielddescr>
+			<fieldname>clientmethod</fieldname>
+			<default_value>none #username rfc931 pam</default_value>
+			<description>
+				<![CDATA[
+list over acceptable authentication methods, order of preference.<br />
+An authentication method not set here will never be selected.<br />
+<br />
+If the socksmethod field is not set in a rule, the global<br />
+socksmethod is filled in for that rule.<br />
+<br />
+methods for client-rules.
+				]]>
+			</description>
+			<type>input</type>
+			<size>60</size>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Socks Method</fielddescr>
+			<fieldname>socksmethod</fieldname>
+			<default_value>none #username rfc931 pam</default_value>
+			<description>
+				<![CDATA[
+list over acceptable authentication methods, order of preference.<br />
+An authentication method not set here will never be selected.<br />
+<br />
+If the socksmethod field is not set in a rule, the global<br />
+socksmethod is filled in for that rule.<br />
+<br />
+methods for socks-rules.
+				]]>
+			</description>
+			<type>input</type>
+			<size>60</size>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>User Privileged</fielddescr>
+			<fieldname>userprivileged</fieldname>
+			<default_value>proxy</default_value>
+			<description>
+				<![CDATA[
+when doing something that can require privilege, it will use the userid "sockd".
+				]]>
+			</description>
+			<type>input</type>
+			<size>60</size>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>User UnPrivileged</fielddescr>
+			<fieldname>userunprivileged</fieldname>
+			<default_value>proxy</default_value>
+			<description>
+				<![CDATA[
+when running as usual, it will use the unprivileged userid of "sockd".
+				]]>
+			</description>
+			<type>input</type>
+			<size>60</size>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Client Timeout</fielddescr>
+			<fieldname>clienttimeout</fieldname>
+			<default_value>0</default_value>
+			<description>
+				<![CDATA[
+how many seconds can the client and it's peer idle without sending<br />
+any data before we dump it?  Unless you disable tcp keep-alive for<br />
+some reason, it's probably best to set this to 0, which is<br />
+"forever".<br />
+timeout.io: 0 # or perhaps 86400, for a day.
+				]]>
+			</description>
+			<type>input</type>
+			<size>5</size>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Socket Timeout</fielddescr>
+			<fieldname>sockettimeout</fieldname>
+			<default_value>30</default_value>
+			<description>
+				<![CDATA[
+how many seconds can pass from when a client connects til it has<br />
+sent us it's request?  Adjust according to your network performance<br />
+and methods supported.<br />
+timeout.negotiate: 30   # on a lan, this should be enough.
+				]]>
+			</description>
+			<type>input</type>
+			<size>5</size>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>UserDef</fielddescr>
+			<fieldname>userparams</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>
+			<description>
+				<![CDATA[
+				User-defined parameter(s) to monitor. There can be multiple user-defined parameters.<br />
+				Example: <em>UserParameter=users,who|wc -l</em>
+				]]>
+			</description>
+			<advancedfield/>
+                </field>
+
+	</fields>
+	<custom_php_install_command>
+		php_install_dante();
+	</custom_php_install_command>
+	<custom_php_validation_command>
+		validate_input_dante($_POST, $input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_dante();
+	</custom_php_resync_config_command>
+	<custom_php_deinstall_command>
+		php_deinstall_dante();
+	</custom_php_deinstall_command>
+</packagegui>

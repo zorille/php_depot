@@ -1,0 +1,171 @@
+<?php
+/**
+ * @ignore
+ */
+/**
+ *
+ * @author dvargas
+ * @package HP
+ * @subpackage Bac
+ */
+if (! isset ( $argv ) && ! isset ( $argc )) {
+	fwrite ( STDOUT, "Il n'y a pas de parametres en argument.\n\n" );
+	exit ( 0 );
+}
+
+//Deplacement pour joindre le repertoire lib
+$deplacement = "/../../../..";
+$rep_document = dirname ( $argv [0] ) . $deplacement;
+
+$INCLUDE_HPOM = true;
+/**
+ * Permet d'inclure toutes les librairies communes necessaires
+ */
+require_once $rep_document . "/php_framework/config.php";
+
+/**
+ *
+ * @ignore Affiche le help.<br>
+ *         Cette fonction fait un exit.
+ *         Arguments reconnus :<br>
+ *         --help
+ */
+function help() {
+	$fichier = basename ( __FILE__ );
+	$help = array (
+			"usage" => array (
+					$fichier . " --conf [fichiers de conf] [OPTIONS]",
+					$fichier . " --help" 
+			),
+			$fichier => array () 
+	);
+	$help [$fichier] ["text"] = array ();
+	$help [$fichier] ["text"] [] .= "Permet d'ouvrir un ticket alerte dans HPOM via BAC";
+	$help [$fichier] ["text"] [] .= "\t--severite severite";
+	$help [$fichier] ["text"] [] .= "\t--bac_detail detail";
+	$help [$fichier] ["text"] [] .= "\t--bac_hostname hostname";
+	$help [$fichier] ["text"] [] .= "\t--bac_alert_name alert_name";
+	$help [$fichier] ["text"] [] .= "\t--bac_profile_name profile_name";
+	$help [$fichier] ["text"] [] .= "\t--bac_texte_name texte_name";
+	$help [$fichier] ["text"] [] .= "\t--bac_trigger trigger";
+	$help [$fichier] ["text"] [] .= "\t--bac_script_name script_name";
+	
+	$class_utilisees = array ( 
+			"hpom_client"
+	);
+	$help = array_merge ( $help, fonctions_standards::help_fonctions_standard ( false, true, $class_utilisees ) );
+	fonctions_standards::affichage_standard_help ( $help );
+	echo "[Exit]0\n";
+	exit ( 0 );
+}
+
+// Cette fonction fait un exit 0
+if ($liste_option->verifie_option_existe ( "help" ))
+	help ();
+	
+	// Le fichier de log est cree
+abstract_log::onInfo_standard ( "Heure de depart : " . date ( "d/m/Y H:i:s", time () ) );
+
+/**
+ * Main programme
+ * Code retour en 2xxx en cas d'erreur
+ * @ignore
+ *
+ * @param options $liste_option        	
+ * @param logs $fichier_log        	
+ * @return boolean
+ */
+function principale(&$liste_option, &$fichier_log) {
+	$fichier_log->setIsErrorStdout ( true );
+	
+	//Dans tous les cas on decoupe le ci du noeud_nom
+	if ($liste_option->verifie_option_existe ( "bac_profile_name" ) !== false && preg_match ( '/^(?P<customer>.*)_(?P<ci>.*)$/U', $liste_option->getOption ( "bac_profile_name" ), $matches ) != 0) {
+		$ci = str_replace ( "_NORMAL", "", $matches ["ci"] );
+		$ci = str_replace ( "_PERMANENT", "", $ci );
+		$ci = str_replace ( "_ETENDU", "", $ci );
+		$client = $matches ["customer"];
+	} else {
+		abstract_log::onError_standard ( "Probleme avec l'argument bac_profile_name" );
+		return false;
+	}
+	
+	//Gestion de la severite
+	if ($liste_option->verifie_option_existe ( "severite", true ) === false) {
+		abstract_log::onError_standard ( "Il manque l'argument severite" );
+		return false;
+	}
+	
+	///Gestion du detail
+	if ($liste_option->verifie_option_existe ( "bac_detail", true ) === false) {
+		$liste_option->setOption ( "bac_detail", "" );
+	}
+	
+	//Gestion du bac_hostname
+	if ($liste_option->verifie_option_existe ( "bac_hostname", true ) === false) {
+		abstract_log::onError_standard ( "Il manque l'argument bac_hostname" );
+		return false;
+	}
+	//Gestion du bac_alert_name
+	if ($liste_option->verifie_option_existe ( "bac_alert_name", true ) === false) {
+		abstract_log::onError_standard ( "Il manque l'argument bac_alert_name" );
+		return false;
+	}
+	//Gestion du bac_texte_name
+	if ($liste_option->verifie_option_existe ( "bac_texte_name", true ) === false) {
+		abstract_log::onError_standard ( "Il manque l'argument bac_texte_name" );
+		return false;
+	}
+	//Gestion du bac_trigger
+	if ($liste_option->verifie_option_existe ( "bac_trigger", true ) === false) {
+		abstract_log::onError_standard ( "Il manque l'argument bac_trigger" );
+		return false;
+	}
+	//Gestion du bac_script_name
+	if ($liste_option->verifie_option_existe ( "bac_script_name", true ) === false) {
+		$liste_option->setOption ( "bac_script_name", "" );
+		//abstract_log::onError_standard ( "Il manque l'argument bac_script_name" );
+		//return false;
+	}
+	
+	abstract_log::onInfo_standard ( "severite = " . $liste_option->getOption ( "severite" ) );
+	abstract_log::onInfo_standard ( "bac_detail = " . $liste_option->getOption ( "bac_detail" ) );
+	abstract_log::onInfo_standard ( "bac_hostname = " . $liste_option->getOption ( "bac_hostname" ) );
+	abstract_log::onInfo_standard ( "bac_alert_name = " . $liste_option->getOption ( "bac_alert_name" ) );
+	abstract_log::onInfo_standard ( "bac_texte_name = " . $liste_option->getOption ( "bac_texte_name" ) );
+	abstract_log::onInfo_standard ( "bac_trigger = " . $liste_option->getOption ( "bac_trigger" ) );
+	abstract_log::onInfo_standard ( "bac_script_name = " . $liste_option->getOption ( "bac_script_name" ) );
+	
+	//message description
+	$message = "This alert was generated by BAC\nAlert from " . $liste_option->getOption ( "bac_hostname" );
+	$message .= "\nTrigger = " . $liste_option->getOption ( "bac_trigger" );
+	$message .= "\nDetail = " . $liste_option->getOption ( "bac_detail" );
+	$message .= "\nAlert Name = " . $liste_option->getOption ( "bac_alert_name" );
+	$message .= "\nText Name = " . $liste_option->getOption ( "bac_texte_name" );
+	$message .= "\nScript Name = " . $liste_option->getOption ( "bac_script_name" );
+	
+	try {
+		$hpom_client = hpom_client::creer_hpom_client ( $liste_option, false );
+		
+		$hpom_client->setMsgGrp ( $client )
+			->setNode ( $ci )
+			->gestion_severite ( $liste_option->getOption ( "severite" ) )
+			->setApplication ( "APPLICATION" )
+			->setObjet ( "Application" )
+			->setInstances ( $liste_option->getOption ( "bac_trigger" ) )
+			->AjouteOption ( "incident_descr", $message )
+			->setAppendMsgText ( $liste_option->getOption ( "bac_alert_name" ) );
+		
+		$hpom_client->envoi_hpom_datas ();
+	} catch ( Exception $e ) {
+		//Erreur deja affichee
+		return false;
+	}
+	
+	return true;
+}
+
+principale ( $liste_option, $fichier_log );
+abstract_log::onInfo_standard ( "Heure de fin : " . date ( "d/m/Y H:i:s", time () ) );
+
+exit ( $fichier_log->renvoiExit () );
+?>

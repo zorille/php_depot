@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/*
+ * xinetd.xml
+ *
+ * part of pfSense (https://www.pfsense.org)
+ * Copyright (c) 2015 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2013 Danilo G. Baio
+ * Copyright (c) 2013 Marcello Coutinho
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+	]]>
+	</copyright>
+	<name>xinetd</name>
+	<title>Services: Xinetd</title>
+	<category>Network</category>
+	<include_file>/usr/local/pkg/xinetd.inc</include_file>
+	<addedit_string>Xinetd has been created/modified.</addedit_string>
+	<delete_string>Xinetd has been deleted.</delete_string>
+	<menu>
+		<name>Xinetd</name>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=xinetd.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>xinetd</name>
+		<rcfile>xinetd_pfsense.sh</rcfile>
+		<executable>xinetd</executable>
+		<description>Xinetd Proxy Deamon</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>Config</text>
+			<url>/pkg_edit.php?xml=xinetd.xml&amp;id=0</url>
+			<active />
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>xinetd_enabled</fieldname>
+			<description>Enable Xinetd service.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<name>Xinetd Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Xinetd Services</fielddescr>
+			<fieldname>xinetdservices</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<rows>20</rows>
+			<cols>75</cols>
+			<default_value></default_value>
+			<description>
+				<![CDATA[
+				User-defined Xinetd Services
+				]]>
+			</description>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		php_install_xinetd();
+	</custom_php_install_command>
+	<custom_php_validation_command>
+		validate_input_xinetd($_POST, $input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_xinetd();
+	</custom_php_resync_config_command>
+	<custom_php_deinstall_command>
+		php_deinstall_xinetd();
+	</custom_php_deinstall_command>
+</packagegui>

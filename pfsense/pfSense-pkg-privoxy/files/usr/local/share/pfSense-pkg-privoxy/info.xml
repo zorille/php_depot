@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<pfsensepkgs>
+	<package>
+		<name>Privoxy</name>
+		<internal_name>privoxy</internal_name>
+		<descr><![CDATA[Gestion de la configuration de Privoxy.]]></descr>
+		<website></website>
+		<version>0.1.1</version>
+		<configurationfile>privoxy.xml</configurationfile>
+	</package>
+</pfsensepkgs>

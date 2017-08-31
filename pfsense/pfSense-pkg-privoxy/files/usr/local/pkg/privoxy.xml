@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/*
+ * privoxy.xml
+ *
+ * part of pfSense (https://www.pfsense.org)
+ * Copyright (c) 2015 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2013 Danilo G. Baio
+ * Copyright (c) 2013 Marcello Coutinho
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+	]]>
+	</copyright>
+	<name>privoxy</name>
+	<title>Services: Privoxy</title>
+	<category>Network</category>
+	<include_file>/usr/local/pkg/privoxy.inc</include_file>
+	<addedit_string>Privoxy has been created/modified.</addedit_string>
+	<delete_string>Privoxy has been deleted.</delete_string>
+	<menu>
+		<name>Privoxy</name>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=privoxy.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>privoxy</name>
+		<rcfile>privoxy_pfsense.sh</rcfile>
+		<executable>privoxy</executable>
+		<description>Privoxy Proxy Deamon</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>Config</text>
+			<url>/pkg_edit.php?xml=privoxy.xml&amp;id=0</url>
+			<active />
+		</tab>
+	</tabs>
+	<advanced_options>enabled</advanced_options>
+	<fields>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>privoxy_enabled</fieldname>
+			<description>Enable Privoxy service.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<name>Privoxy Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Hostname</fielddescr>
+			<fieldname>hostname</fieldname>
+			<description>Unique, case sensitive hostname.</description>
+			<type>input</type>
+			<default_value>pfsense.josue</default_value>
+			<size>60</size>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Interfaces</fielddescr>
+			<fieldname>listeaddress</fieldname>
+			<default_value>192.168.100.97</default_value>
+			<description>Select the internal interfaces, such as LAN, where Privoxy listen</description>
+			<type>interfaces_selection</type>
+			<showvirtualips/>
+			<showips/>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Listen Port</fielddescr>
+			<fieldname>listenport</fieldname>
+			<default_value>8118</default_value>
+			<description>Listen port for connections to Privoxy</description>
+			<type>input</type>
+			<size>5</size>
+			<required/>
+		</field>
+		<field>
+			<name>Privoxy Forwards</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Forward List</fielddescr>
+			<fieldname>forwardlist</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>100</cols>
+			<default_value></default_value>
+			<description>
+				<![CDATA[
+				User-defined parameter(s) to monitor. There can be multiple user-defined parameters.<br />
+				Example: forward-socks5   yum.fqdn:443/  localhost:10443  .
+				]]>
+			</description>
+		</field>
+		<field>
+			<fielddescr>Debug Level</fielddescr>
+			<fieldname>debug_level</fieldname>
+			<description>
+				<![CDATA[
+        debug     1 # Log the destination for each request Privoxy let through. See also debug 1024.<br />
+        debug     2 # show each connection status<br />
+        debug     4 # show I/O status<br />
+        debug     8 # show header parsing<br />
+        debug    16 # log all data written to the network<br />
+        debug    32 # debug force feature<br />
+        debug    64 # debug regular expression filters<br />
+        debug   128 # debug redirects<br />
+        debug   256 # debug GIF de-animation<br />
+        debug   512 # Common Log Format<br />
+        debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.<br />
+        debug  2048 # CGI user interface<br />
+        debug  4096 # Startup banner and warnings.<br />
+        debug  8192 # Non-fatal errors<br />
+        debug 32768 # log all data read from the network<br />
+        debug 65536 # Log the applying actions<br />
+				]]></description>
+			<type>select</type>
+			<options>
+				<option><name>Debug     1</name><value>debug     1</value></option>
+				<option><name>Debug     2</name><value>debug     2</value></option>
+				<option><name>Debug     4</name><value>debug     4</value></option>
+				<option><name>Debug     8</name><value>debug     8</value></option>
+				<option><name>Debug    16</name><value>debug    16</value></option>
+				<option><name>Debug    32</name><value>debug    32</value></option>
+				<option><name>Debug    64</name><value>debug    64</value></option>
+				<option><name>Debug   128</name><value>debug   128</value></option>
+				<option><name>Debug   256</name><value>debug   256</value></option>
+				<option><name>Debug   512</name><value>debug   512</value></option>
+				<option><name>Debug  1024</name><value>debug  1024</value></option>
+				<option><name>Debug  2048</name><value>debug  2048</value></option>
+				<option><name>Debug  4096</name><value>debug  4096</value></option>
+				<option><name>Debug  8192</name><value>debug  8192</value></option>
+				<option><name>Debug 32768</name><value>debug 32768</value></option>
+				<option><name>Debug 65536</name><value>debug 65536</value></option>
+			</options>
+			<multiple/>
+			<size>10</size>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Socket Timeout</fielddescr>
+			<fieldname>sockettimeout</fieldname>
+			<default_value>300</default_value>
+			<description>Socket Timeout for Privoxy</description>
+			<type>input</type>
+			<size>5</size>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>UserDef</fielddescr>
+			<fieldname>userparams</fieldname>
+			<encoding>base64</encoding>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>
+			<description>
+				<![CDATA[
+				User-defined parameter(s) to monitor. There can be multiple user-defined parameters.<br />
+				Example: <em>UserParameter=users,who|wc -l</em>
+				]]>
+			</description>
+			<advancedfield/>
+                </field>
+
+	</fields>
+	<custom_php_install_command>
+		php_install_privoxy();
+	</custom_php_install_command>
+	<custom_php_validation_command>
+		validate_input_privoxy($_POST, $input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_privoxy();
+	</custom_php_resync_config_command>
+	<custom_php_deinstall_command>
+		php_deinstall_privoxy();
+	</custom_php_deinstall_command>
+</packagegui>

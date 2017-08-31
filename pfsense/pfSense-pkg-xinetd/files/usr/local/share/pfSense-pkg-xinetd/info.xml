@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<pfsensepkgs>
+	<package>
+		<name>Xinetd</name>
+		<internal_name>xinetd</internal_name>
+		<descr><![CDATA[Gestion de la configuration de Xinetd.]]></descr>
+		<website></website>
+		<version>0.1.1</version>
+		<configurationfile>xinetd.xml</configurationfile>
+	</package>
+</pfsensepkgs>

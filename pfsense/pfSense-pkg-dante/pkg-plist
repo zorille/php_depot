@@ -1,0 +1,6 @@
+pkg/dante.xml
+pkg/dante.inc
+www/shortcuts/pkg_dante.inc
+/etc/inc/priv/dante.priv.inc
+%%DATADIR%%/info.xml
+@dir /etc/inc/priv

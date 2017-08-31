@@ -1,0 +1,16 @@
+alert2om_start:tag
+alert2om_severity:<category>
+alert2om_fullgroup:<FullGroupId>
+alert2om_ci:<group>
+alert2om_monitor:<name>
+alert2om_state:<state>
+alert2om_alert_time:<time>
+alert2om_remoteMachineName:<remoteMachineName>
+alert2om_class: <_class>
+alert2om_regexp_value0: <value>
+alert2om_regexp_value1: <value2>
+alert2om_regexp_value2: <value3>
+alert2om_regexp_value3: <value4>
+alert2om_sitescopeurl:<sitescopeURL>
+alert2om_end:tag
+<All>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<pfsensepkgs>
+	<package>
+		<name>ELK Beats</name>
+		<internal_name>elkbeats</internal_name>
+		<descr><![CDATA[Gestion de la configuration de ELK Beats.]]></descr>
+		<website></website>
+		<version>0.1.1</version>
+		<configurationfile>beats.xml</configurationfile>
+	</package>
+</pfsensepkgs>

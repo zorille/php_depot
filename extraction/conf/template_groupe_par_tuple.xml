@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	
+	<fonctions_client>./lib/client/fonctions_groupe_par_tuple.php</fonctions_client> <!-- optionnel -->
+<serial_liste>
+	<serial>789456123</serial>
+	<serial>789456124</serial>
+</serial_liste>
+
+<mail sort_en_erreur="non" using="non">
+	<to>zorille@client.com</to>
+	<from>noreply@client.com</from>
+</mail>
+
+<!-- Les noms des champs doivent etre uniques -->
+<sql type="sqlite">
+        <requetelist>
+		<champ_maitre>champ1</champ_maitre>
+		<sous_champ>champ2</sous_champ>
+		<sous_champ>champ3</sous_champ>
+		<requete>select champ1,champ2,champ13 from table1 where type=0;</requete>
+        </requetelist>
+</sql>
+
+<algorythme algo_serials="oui" algo_dates="non">
+
+	<algotest type="date">
+		<operateur>+</operateur>
+	</algotest>
+	<algotest2 type="serial">
+		<operateur>+</operateur>
+	</algotest2>
+</algorythme>
+
+
+<fichier affiche_date="oui">
+	<nom>client_export</nom> <!--facultatif-->
+	<extension>.csv</extension>
+	<repertoire>/home/dvargas/scripts/extraction/export</repertoire> <!--facultatif-->
+</fichier>
+
+<ordre_de_sortie separateur=";" ajoute_date="non">
+	<champ>
+		<titre>Nom1</titre>
+		<nom_algo>champ1</nom_algo>
+	</champ>
+	<champ>
+		<titre>Nom2</titre>
+		<nom_algo>champ2</nom_algo>
+	</champ>
+	<champ>
+		<titre>Nom3</titre>
+		<nom_algo>champ3</nom_algo>
+	</champ>
+</ordre_de_sortie>
+
+</xml>

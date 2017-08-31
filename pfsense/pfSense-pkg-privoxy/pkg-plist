@@ -1,0 +1,7 @@
+etc/privoxy/match-all.action
+pkg/privoxy.xml
+pkg/privoxy.inc
+www/shortcuts/pkg_privoxy.inc
+/etc/inc/priv/privoxy.priv.inc
+%%DATADIR%%/info.xml
+@dir /etc/inc/priv

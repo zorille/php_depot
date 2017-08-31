@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<pfsensepkgs>
+	<package>
+		<name>Dante</name>
+		<internal_name>dante</internal_name>
+		<descr><![CDATA[Gestion de la configuration de Dante Socks.]]></descr>
+		<website></website>
+		<version>0.1.1</version>
+		<configurationfile>dante.xml</configurationfile>
+	</package>
+</pfsensepkgs>

@@ -1,0 +1,6 @@
+pkg/beats.xml
+pkg/beats.inc
+www/shortcuts/pkg_beats.inc
+/etc/inc/priv/beats.priv.inc
+%%DATADIR%%/info.xml
+@dir /etc/inc/priv

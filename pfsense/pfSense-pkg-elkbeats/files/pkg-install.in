@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ "${2}" != "POST-INSTALL" ]; then
+	exit 0
+fi
+
+pkg add beats-5.3.0.txz
+/usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
