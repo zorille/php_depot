@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0">
+  <constants>
+  </constants>
+  <classes>
+    <!-- <class id="lnkConnectableCIToNetworkDevice" _delta="must_exist">
+      <properties>
+        <naming _delta="redefine">
+          <attributes>
+            <attribute id="device_port"/>
+          </attributes>
+        </naming>
+      </properties>
+      <fields>
+        <field id="device_port" xsi:type="AttributeString" _delta="delete" />
+        <field id="device_port" xsi:type="AttributeExternalKey" _delta="define">
+          <filter><![CDATA[SELECT PhysicalInterface WHERE connectableci_id= :this->connectableci_id]]></filter>
+          <sql>device_port</sql>
+          <target_class>PhysicalInterface</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+          <allow_target_creation>false</allow_target_creation>
+        </field>
+        <field id="device_name" xsi:type="AttributeExternalField" _delta="define">
+          <extkey_attcode>device_port</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
+        <field id="network_port" xsi:type="AttributeString" _delta="delete" />
+        <field id="network_port" xsi:type="AttributeExternalKey" _delta="define">
+          <filter><![CDATA[SELECT PhysicalInterface WHERE connectableci_id= :this->networkdevice_id]]></filter>
+          <sql>network_port</sql>
+          <target_class>PhysicalInterface</target_class>
+          <is_null_allowed>true</is_null_allowed>
+          <on_target_delete>DEL_MANUAL</on_target_delete>
+          <allow_target_creation>false</allow_target_creation>
+        </field>
+        <field id="network_name" xsi:type="AttributeExternalField" _delta="define">
+          <extkey_attcode>network_port</extkey_attcode>
+          <target_attcode>name</target_attcode>
+        </field>
+      </fields>
+      <presentation>
+        <details _delta="redefine">
+          <items>
+            <item id="networkdevice_id">
+              <rank>10</rank>
+            </item>
+            <item id="connectableci_id">
+              <rank>20</rank>
+            </item>
+            <item id="network_port">
+              <rank>30</rank>
+            </item>
+            <item id="device_port">
+              <rank>40</rank>
+            </item>
+            <item id="connection_type">
+              <rank>50</rank>
+            </item>
+          </items>
+        </details>
+        <search _delta="redefine">
+          <items>
+            <item id="networkdevice_id">
+              <rank>10</rank>
+            </item>
+            <item id="connectableci_id">
+              <rank>20</rank>
+            </item>
+            <item id="network_port">
+              <rank>30</rank>
+            </item>
+            <item id="device_port">
+              <rank>40</rank>
+            </item>
+            <item id="connection_type">
+              <rank>50</rank>
+            </item>
+          </items>
+        </search>
+        <list _delta="redefine">
+          <items>
+            <item id="networkdevice_id">
+              <rank>10</rank>
+            </item>
+            <item id="connectableci_id">
+              <rank>20</rank>
+            </item>
+            <item id="network_port">
+              <rank>30</rank>
+            </item>
+            <item id="device_port">
+              <rank>40</rank>
+            </item>
+            <item id="connection_type">
+              <rank>50</rank>
+            </item>
+          </items>
+        </list>
+      </presentation>
+    </class>
+    <class id="ConnectableCI" _delta="must_exist">
+      <relations>
+        <relation id="impacts">
+          <neighbours>
+            <neighbour id="networkdevices" _delta="define">
+              <attribute>networkdevice_list</attribute>
+              <direction>down</direction>
+            </neighbour>
+          </neighbours>
+        </relation>
+      </relations>
+    </class> -->
+  </classes>
+  <user_rights>
+  </user_rights>
+</itop_design>
