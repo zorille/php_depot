@@ -142,6 +142,9 @@ function sync_package_privoxy() {
 		$privoxy_config = $config['installedpackages']['privoxy']['config'][0];
 		if ($privoxy_config['privoxy_enabled'] == "on") {
 			$confdir = PRIVOXY_CONF_DIR;
+			
+			$interfaces=get_connected_interface();
+			$listeaddress = find_interface($privoxy_config['listeaddress'],$interfaces);
 
 			$UserParams = base64_decode($privoxy_config['userparams']);
 			$listitems = explode (",",$privoxy_config['debug_level']);
@@ -164,7 +167,7 @@ logfile logfile
 {$debuglist}
 
 hostname {$privoxy_config['hostname']}
-listen-address  {$privoxy_config['listeaddress']}:{$privoxy_config['listenport']}
+listen-address  {$listeaddress['IP4']}:{$privoxy_config['listenport']}
 toggle  1
 enable-remote-toggle  0
 enable-remote-http-toggle  0
@@ -201,6 +204,59 @@ EOF;
 	}
 
 	conf_mount_ro();
+}
+
+function get_connected_interface() {
+	static $interfaces=array();
+	if (!count($interfaces)) {
+		$curif="";
+		// launch ifconfig and parse its result (inet/inet6)
+		// but only at first function call
+		exec("ifconfig",$out);
+		foreach($out as $line) {
+			if (preg_match("#^([a-z\.]*)([0-9]*): #",$line,$mat)) {
+				$curif=count($interfaces);
+				$interfaces[$curif]['name']=$mat[1].$mat[2];
+			}
+			if (preg_match("#inet ([0-9\.]*) #",$line,$mat)) {
+				$interfaces[$curif]['IP4']=$mat[1];
+			}
+			if (preg_match("#inet6 ([0-9a-fA-F:]*) #",$line,$mat)) {
+				$interfaces[$curif]['IP6']=$mat[1];
+			}
+		}
+	}
+	return $interfaces;
+}
+
+function find_interface($pfsense_name,$interfaces){
+	switch($pfsense_name) {
+		case "wan":
+			if(isset($interfaces[0]['name'])){
+				return $interfaces[0]['name'];
+			}
+			return "vmx0";
+		case "lan":
+			if(isset($interfaces[1]['name'])){
+				return $interfaces[1]['name'];
+			}
+			return "vmx1";
+		case "opt1":
+			if(isset($interfaces[2]['name'])){
+				return $interfaces[2]['name'];
+			}
+			return "vmx2";
+		case "opt2":
+			if(isset($interfaces[3]['name'])){
+				return $interfaces[3]['name'];
+			}
+			return "vmx3";
+		case "lo0":
+		case "loopback":
+		case "localhost":
+			return "127.0.0.1";
+	}
+	return $pfsense_name;
 }
 
 ?>
