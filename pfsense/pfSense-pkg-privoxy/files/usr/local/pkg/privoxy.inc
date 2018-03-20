@@ -143,8 +143,8 @@ function sync_package_privoxy() {
 		if ($privoxy_config['privoxy_enabled'] == "on") {
 			$confdir = PRIVOXY_CONF_DIR;
 			
-			$interfaces=get_connected_interface();
-			$listeaddress = find_IPV4($privoxy_config['listeaddress'],$interfaces);
+			$interfaces=privoxy_get_connected_interface();
+			$listeaddress = privoxy_find_IPV4($privoxy_config['listeaddress'],$interfaces);
 
 			$UserParams = base64_decode($privoxy_config['userparams']);
 			$listitems = explode (",",$privoxy_config['debug_level']);
@@ -206,7 +206,7 @@ EOF;
 	conf_mount_ro();
 }
 
-function get_connected_interface() {
+function privoxy_get_connected_interface() {
 	static $interfaces=array();
 	if (!count($interfaces)) {
 		$curif="";
@@ -229,7 +229,7 @@ function get_connected_interface() {
 	return $interfaces;
 }
 
-function find_IPV4($pfsense_name,$interfaces){
+function privoxy_find_IPV4($pfsense_name,$interfaces){
 	switch($pfsense_name) {
 		case "wan":
 			if(isset($interfaces[0]['IP4'])){
