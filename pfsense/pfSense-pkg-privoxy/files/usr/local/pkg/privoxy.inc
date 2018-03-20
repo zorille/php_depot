@@ -144,7 +144,7 @@ function sync_package_privoxy() {
 			$confdir = PRIVOXY_CONF_DIR;
 			
 			$interfaces=get_connected_interface();
-			$listeaddress = find_interface($privoxy_config['listeaddress'],$interfaces);
+			$listeaddress = find_IPV4($privoxy_config['listeaddress'],$interfaces);
 
 			$UserParams = base64_decode($privoxy_config['userparams']);
 			$listitems = explode (",",$privoxy_config['debug_level']);
@@ -229,28 +229,28 @@ function get_connected_interface() {
 	return $interfaces;
 }
 
-function find_interface($pfsense_name,$interfaces){
+function find_IPV4($pfsense_name,$interfaces){
 	switch($pfsense_name) {
 		case "wan":
-			if(isset($interfaces[0]['name'])){
-				return $interfaces[0]['name'];
+			if(isset($interfaces[0]['IP4'])){
+				return $interfaces[0]['IP4'];
 			}
-			return "vmx0";
+			break;
 		case "lan":
-			if(isset($interfaces[1]['name'])){
-				return $interfaces[1]['name'];
+			if(isset($interfaces[1]['IP4'])){
+				return $interfaces[1]['IP4'];
 			}
-			return "vmx1";
+			break;
 		case "opt1":
-			if(isset($interfaces[2]['name'])){
-				return $interfaces[2]['name'];
+			if(isset($interfaces[2]['IP4'])){
+				return $interfaces[2]['IP4'];
 			}
-			return "vmx2";
+			break;
 		case "opt2":
-			if(isset($interfaces[3]['name'])){
-				return $interfaces[3]['name'];
+			if(isset($interfaces[3]['IP4'])){
+				return $interfaces[3]['IP4'];
 			}
-			return "vmx3";
+			break;
 		case "lo0":
 		case "loopback":
 		case "localhost":
