@@ -167,7 +167,7 @@ logfile logfile
 {$debuglist}
 
 hostname {$privoxy_config['hostname']}
-listen-address  {$listeaddress['IP4']}:{$privoxy_config['listenport']}
+listen-address  {$listeaddress}:{$privoxy_config['listenport']}
 toggle  1
 enable-remote-toggle  0
 enable-remote-http-toggle  0
