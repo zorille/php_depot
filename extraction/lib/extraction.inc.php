@@ -10,7 +10,7 @@
  * et renvoi le resultat sous forme de tableau.
  *
  * @param string $sql Requete a appliquer.
- * @param db $connexion Connexion au storage ou au sqlite.
+ * @param requete $connexion Connexion au storage ou au sqlite.
  * @return array Tableau de resultat.
  */
 function requete($sql, &$connexion) {

@@ -392,7 +392,7 @@ class sitescope_tasks_functions extends abstract_log {
 	 * @param int $duration Temps defini en Unit
 	 * @param string $unit Unit de type m,h,d,w (minutes,heures,jours,semaines)
 	 * @param int $diff_seconde differentiel en seconde
-	 * @return long nombre de seconde des unites de temps
+	 * @return integer nombre de seconde des unites de temps
 	 */
 	public function calcul_duration($duration, $unit, $diff_seconde=0) {
 		switch ($unit) {

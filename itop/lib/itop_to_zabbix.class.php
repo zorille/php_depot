@@ -290,7 +290,7 @@ class itop_to_zabbix extends abstract_log {
 
 	/**
 	 * 
-	 * @param unknown $datas
+	 * @param array $liste_cis
 	 * @return itop_to_zabbix
 	 * @throws Exception
 	 */

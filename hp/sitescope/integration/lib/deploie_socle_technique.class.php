@@ -21,7 +21,7 @@ class deploie_socle_technique extends abstract_log {
 	 * var privee
 	 *
 	 * @access private
-	 * @var sitescope_functions_standards
+	 * @var sitescope_fonctions_standards
 	 */
 	private $sitescope_functions_standards = null;
 	/**
@@ -59,7 +59,7 @@ class deploie_socle_technique extends abstract_log {
 	 * @codeCoverageIgnore
 	 * @param options $liste_option Reference sur un objet options
 	 * @param sitescope_template_datas $sis_template_datas Pointeur sur un objet sitescope_template_datas.
-	 * @param sitescope_functions_standards $sitescope_functions_standards Pointeur sur un objet sitescope_functions_standards.
+	 * @param sitescope_fonctions_standards $sitescope_functions_standards Pointeur sur un objet sitescope_functions_standards.
 	 * @param string|Boolean $sort_en_erreur Prend les valeurs oui/non ou true/false
 	 * @param string $entete Entete des logs de l'objet gestion_connexion_url
 	 * @return deploie_socle_technique
@@ -107,7 +107,7 @@ class deploie_socle_technique extends abstract_log {
 	 * @codeCoverageIgnore
 	 * @param options $liste_options Pointeur sur les arguments.
 	 * @param sitescope_template_datas $sis_template_datas Pointeur sur un objet sitescope_template_datas.
-	 * @param sitescope_functions_standards $sitescope_functions_standards Pointeur sur un objet sitescope_functions_standards.
+	 * @param sitescope_fonctions_standards $sitescope_functions_standards Pointeur sur un objet sitescope_functions_standards.
 	 * @param string|Bool $sort_en_erreur Prend les valeurs oui/non ou true/false
 	 * @return true
 	 */

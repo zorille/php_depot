@@ -49,7 +49,7 @@ require_once $liste_option ->getOption ( "rep_scripts" ) . '/lib/itop_liste_ci.c
  *
  * @param options $liste_option
  * @param logs $fichier_log
- * @return Ambigous <true, boolean>|boolean
+ * @return boolean
  */
 function principale(&$liste_option, &$fichier_log) {
 	if ($liste_option ->verifie_option_existe ( "fichier_sortie", true ) === false) {

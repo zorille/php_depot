@@ -53,7 +53,7 @@ class synchro_base extends abstract_log {
 	 * Applique les requetes et renvoi un tableau "de hash" representant la liste des tuples : <br>
 	 * $tableau["champ1"]["champ2"].....["champN"]=1
 	 *
-	 * @param db $connexion Connexion ouverte sur une base (objet BD).
+	 * @param requete $connexion Connexion ouverte sur une base (objet BD).
 	 * @param string $requete Requete a appliquer sur la base.
 	 * @return array|false Tableau de resultat (liste des tuples), FALSE sinon.
 	 */
@@ -226,7 +226,7 @@ class synchro_base extends abstract_log {
 	 * Supprime les tuples en trop dans la base de destination.
 	 *
 	 * @param array $tableau_comparee Tableau renvoye par _CompareTuple.
-	 * @param db $connexion_dest Connexion vers la base de destination.
+	 * @param requete $connexion_dest Connexion vers la base de destination.
 	 * @param string $table Table a modifier dans la base de destination.
 	 * @param array $liste_champs Liste des champs de la table de destination.
 	 * @return Bool TRUE si OK, FALSE sinon.
@@ -281,7 +281,7 @@ class synchro_base extends abstract_log {
 	 * Ajoute les tuples manquants dans la base de destination.
 	 *
 	 * @param array $tableau_comparee Tableau renvoye par _CompareTuple.
-	 * @param db $connexion_dest Connexion vers la base de destination.
+	 * @param requete $connexion_dest Connexion vers la base de destination.
 	 * @param string $table Table a modifier dans la base de destination.
 	 * @param array $liste_champs Liste des champs de la table de destination.
 	 * @return Bool TRUE si OK, FALSE sinon.
@@ -445,8 +445,8 @@ class synchro_base extends abstract_log {
 	 * Ordonnance la synchronisation de chaque table du fichier de configuration.
 	 *
 	 * @param options &$liste_option Pointeur sur les arguments.
-	 * @param db $connexion_entree Connexion vers la base d'origine.
-	 * @param db $connexion_sortie Connexion vers la base de destination.
+	 * @param requete $connexion_entree Connexion vers la base d'origine.
+	 * @param requete $connexion_sortie Connexion vers la base de destination.
 	 * @param array &$connexion liste de connexions connue
 	 * @return Bool TRUE si OK, FALSE sinon.
 	 */

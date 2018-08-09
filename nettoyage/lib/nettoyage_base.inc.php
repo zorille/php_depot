@@ -49,7 +49,7 @@ Par fichier XML :
  *
  * @param logs &$fichier Pointeur sur un objet logs pour l'affichage.
  * @param options &$liste_option Pointeur sur les arguments.
- * @param db $connexion Connexion vers la base de donnee.
+ * @param requete $connexion Connexion vers la base de donnee.
  * @return Bool TRUE si OK, FALSE sinon.
 */
 function nettoie_table(&$fichier,&$liste_option,$connexion)

@@ -50,7 +50,7 @@ require_once $liste_option ->renvoie_option ( "rep_scripts" ) . '/lib/itop_ci.cl
  *
  * @param options $liste_option
  * @param logs $fichier_log
- * @return Ambigous <true, boolean>|boolean
+ * @return boolean
  */
 function principale(&$liste_option, &$fichier_log) {
 	if ($liste_option ->verifie_option_existe ( "itop_serveur", true ) === false) {
