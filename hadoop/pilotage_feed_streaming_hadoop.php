@@ -142,32 +142,32 @@ if ($continue && $mongo && $liste_dates) {
 		
 		$flux->verifie_variables_ftp ( $liste_option, "hadoop" );
 		
-		$hit = hit_sender::creer_hit_sender ();
-		$hit->connectService ( "ftp://" . $liste_option->getOption ( array (
-				"ftp",
-				"hadoop",
-				"serveur" 
-		) ) . ":" . $liste_option->getOption ( array (
-				"ftp",
-				"hadoop",
-				"port" 
-		) ) . "/user/hive/warehouse/streaming.db/uuid/dt=" . $date . "/uuid" );
-		$hit->setUserPasswd ( $liste_option->getOption ( array (
-				"ftp",
-				"hadoop",
-				"user" 
-		) ), $liste_option->getOption ( array (
-				"ftp",
-				"hadoop",
-				"passwd" 
-		) ) );
-		$hit->setTimeout ( 100 );
-		$hit->setVerbose ();
-		$hit->setEpsv ( false );
-		$hit->ftp_curl_put ( $fichier_sortie, false );
-		$liste = $hit->ftp_curl_list ();
-		//$liste_dossier=preg_split('/[\r\n]+/', $liste, -1, PREG_SPLIT_NO_EMPTY);
-		$hit->close ();
+// 		$hit = hit_sender::creer_hit_sender ();
+// 		$hit->connectService ( "ftp://" . $liste_option->getOption ( array (
+// 				"ftp",
+// 				"hadoop",
+// 				"serveur" 
+// 		) ) . ":" . $liste_option->getOption ( array (
+// 				"ftp",
+// 				"hadoop",
+// 				"port" 
+// 		) ) . "/user/hive/warehouse/streaming.db/uuid/dt=" . $date . "/uuid" );
+// 		$hit->setUserPasswd ( $liste_option->getOption ( array (
+// 				"ftp",
+// 				"hadoop",
+// 				"user" 
+// 		) ), $liste_option->getOption ( array (
+// 				"ftp",
+// 				"hadoop",
+// 				"passwd" 
+// 		) ) );
+// 		$hit->setTimeout ( 100 );
+// 		$hit->setVerbose ();
+// 		$hit->setEpsv ( false );
+// 		$hit->ftp_curl_put ( $fichier_sortie, false );
+// 		$liste = $hit->ftp_curl_list ();
+// 		//$liste_dossier=preg_split('/[\r\n]+/', $liste, -1, PREG_SPLIT_NO_EMPTY);
+// 		$hit->close ();
 		
 		$mongo->requete_update_dans_jobs ( $jobid, "__no_update", "__no_update", "ok", 0, "__no_update", "__no_update", date ( "Ymd H:i:s" ) );
 		

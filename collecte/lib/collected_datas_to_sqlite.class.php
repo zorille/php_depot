@@ -113,6 +113,9 @@ class collected_datas_to_sqlite extends parse_collected_datas {
 		
 		foreach ( $this->getDonneesSortie () as $valeurs ) {
 			$valeurs ["titre"] = str_replace ( $this->getSeparateur (), "^", $valeurs ["titre"] );
+			if(!isset($valeurs ["valeurs"])){
+				continue;
+			}
 			foreach ( $valeurs ["valeurs"] as $valeur ) {
 				if(trim($valeur)==""){
 					continue;
