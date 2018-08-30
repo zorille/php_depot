@@ -17,7 +17,7 @@ if (! isset ( $argv ) && ! isset ( $argc )) {
 $deplacement = "/../..";
 $rep_document = dirname ( $argv [0] ) . $deplacement;
 
-//On reconstruit la liste des arguments au format "Framework PHP"
+//On reconstruit la liste des arguments au format "Framework PHP" s'il n'y a que 4 arguments
 if ($argc == 4) {
 	$nom = $argv [1];
 	$sujet = $argv [2];
@@ -36,11 +36,10 @@ if ($argc == 4) {
 	$argv [] .= 'itop';
 #	$argv [] .= '--verbose';
 #	$argv [] .= '2';
-} else {
-	$argv [] .= "--help";
-}
 
-$argc = count ( $argv );
+	$argc = count ( $argv );
+} 
+
 /**
  * Permet d'inclure toutes les librairies communes necessaires
  */
