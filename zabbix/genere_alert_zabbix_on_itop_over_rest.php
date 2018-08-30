@@ -34,6 +34,8 @@ if ($argc == 4) {
 	$argv [] .= $rep_document . '/conf_clients/itop/itop_users.xml';
 	$argv [] .= '--itop_serveur';
 	$argv [] .= 'itop';
+	$argv [] .= '--itop_organisation';
+	$argv [] .= 'client';
 #	$argv [] .= '--verbose';
 #	$argv [] .= '2';
 
@@ -104,9 +106,12 @@ function principale(&$liste_option, &$fichier_log) {
 		abstract_log::onError_standard ( "il manque le parametre zabbix_action_message dans la ligne de commande." );
 		return false;
 	}
+	if ($liste_option ->verifie_option_existe ( "itop_organisation" ) === false) {
+		$liste_option->setOption('itop_organisation', 'client');
+	}
 	
 	//trig_node:(.*)trig_stat:(.*)trig_sev:(.*)trig_key:(.*)trig_ip:(.*)trig_name:(.*)trig_value:(.*)trig_expr:(.*)
-	if (preg_match ( "/trig_eti:(?<eti>.*)trig_node:(?<node>.*)trig_stat:(?<stat>.*)trig_sev:(?<sev>.*)trig_key:(?<key>.*)trig_ip:(?<ip>.*)trig_name:(?<name>.*)trig_value:(?<value>.*)trig_expr:(?<expr>.*)trig_app:(?<app>.*)/", $liste_option ->getOption ( "zabbix_action_message" ), $donnees )) {
+	if (preg_match ( "/trig_eti:(?<eti>.*)(\n|\r)trig_node:(?<node>.*)(\n|\r)trig_stat:(?<stat>.*)(\n|\r)trig_sev:(?<sev>.*)(\n|\r)trig_key:(?<key>.*)(\n|\r)trig_ip:(?<ip>.*)(\n|\r)trig_name:(?<name>.*)(\n|\r)trig_value:(?<value>.*)(\n|\r)trig_expr:(?<expr>.*)(\n|\r)trig_app:(?<app>.*)/", $liste_option ->getOption ( "zabbix_action_message" ), $donnees )) {
 		if (! isset ( $donnees ["eti"] ) || $donnees ["eti"] == "") {
 			abstract_log::onError_standard ( "Pas de trig_eti dans la ligne." );
 		}
@@ -197,11 +202,11 @@ ENDTXT;
 	try {
 		//Gestion des functionnalCI a ajouter
 		$itop_FCI = itop_FunctionalCI::creer_itop_FunctionalCI ( $liste_option, $itop_webservice_rest ) ->retrouve_FunctionalCI ( $node );
-		$itop_incident ->gestion_Incident ( $liste_option ->getOption ( "zabbix_action_sujet" ), "client", $msg_text, 1, 2, 'monitoring', array (), array ( 
+		$itop_incident ->gestion_Incident ( $liste_option ->getOption ( "zabbix_action_sujet" ), $liste_option ->getOption ( "itop_organisation" ), $msg_text, 1, 2, 'monitoring', array (), array ( 
 				$itop_FCI ->creer_lnkToFunctionalCI () ) );
 	} catch ( Exception $e ) {
 		
-		$itop_incident ->gestion_Incident ( $liste_option ->getOption ( "zabbix_action_sujet" ), "client", $msg_text, 1, 2, 'monitoring' );
+		$itop_incident ->gestion_Incident ( $liste_option ->getOption ( "zabbix_action_sujet" ), $liste_option ->getOption ( "itop_organisation" ), $msg_text, 1, 2, 'monitoring' );
 	}
 	
 // 	try {
