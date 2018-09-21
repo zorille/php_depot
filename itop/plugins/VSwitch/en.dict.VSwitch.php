@@ -8,17 +8,14 @@
 
 Dict::Add('EN US', 'English', 'English', array(
 	// Dictionary entries go here
-	'Class:VSwitch' => '(D)VSwitch',
-	'Class:VSwitch+' => 'VSwitch or Distributed VSwitch',
+	'Class:VSwitch' => 'VSwitch',
+	'Class:VSwitch+' => 'VSwitch',
+	'VSwitch:baseinfo' => 'General information',
+	'VSwitch:VirtualInfo' => 'ESXI Host',
 	'Class:VSwitch/Attribute:farm_id' => 'vCluster/ESXi',
-	'Class:VSwitch/Attribute:virtualmachine_id' => 'vCenter',
-	'Class:VSwitch/Attribute:virtualmachine_id+' => 'Mandatory in DVSwitch mode',
-	'Class:VSwitch/Attribute:physicalinterfaces_list' => 'Network Interface',
-	'Class:VSwitch/Attribute:physicalinterfaces_list+' => 'Network Interface connected to (D)VSwitch',
-	'Class:VSwitch/Attribute:vmportgroups_list' => 'Port-groups',
-	'Class:VSwitch/Attribute:vmportgroups_list+' => 'Liste des Port-Groups connectés au (D)VSwitch',
-	'Class:VCenter' => 'vCenter',
-	'Class:VCenter/Attribute:vswitchs_list' => '(D)VSwitchs',
-	'Class:VCenter/Attribute:vswitchs_list+' => '(D)VSwitchs connected to vCenter',
+	'Class:VirtualSwitch/Attribute:physicalinterfaces_list' => 'Network Interface',
+	'Class:VirtualSwitch/Attribute:physicalinterfaces_list+' => 'Network Interface connected to VSwitch',
+	'Class:Hypervisor/Attribute:vswitchs_list' => 'VSwitchs List',
+	'Class:Hypervisor/Attribute:vswitchs_list+' => 'VSwitchs connected to VCluster/ESXI',
 ));
 ?>

@@ -17,7 +17,7 @@ SetupWebPage::AddModule(
 		'dependencies' => array(
 			'itop-config-mgmt/2.0.0',
 			'itop-virtualization-mgmt/2.0.0',
-			'teemip-ip-mgmt/2.1.0'
+			'VSwitch/1.0.0'
 			// 'itop-endusers-devices/2.0.0'
 		),
 		'mandatory' => false,
