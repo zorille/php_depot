@@ -185,7 +185,7 @@ function sync_package_dante() {
 	// Check Dante settings
 	if (is_array($config['installedpackages']['dante'])) {
 		$dante_config = $config['installedpackages']['dante']['config'][0];
-		if ($dante_config['dante_enabled'] == "on") {
+		if ($dante_config['dante_enabled'] == "on" && $dante_config['dante_interface_conf'] == "on" ) {
 			$interfaces=get_connected_interface();
 			$listitems = explode (",",$dante_config['internalinterfaces']);
 			$internallist = "";
@@ -251,8 +251,9 @@ timeout.negotiate: {$dante_config['sockettimeout']}
 {$Routes}
 
 EOF;
-			file_put_contents(DANTE_CONF, strtr($dante_conf_file, array("\r" => "")));
-		}
+            mwexec("/bin/cp -f ".DANTE_CONF." ".DANTE_CONF."_sav");
+            file_put_contents(DANTE_CONF, strtr($dante_conf_file, array("\r" => "")));
+		} 
 	}
 
 	if (is_array($dante_config) && $dante_config['dante_enabled'] == "on") {

@@ -61,6 +61,12 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Use Interface Configuration</fielddescr>
+			<fieldname>dante_interface_conf</fieldname>
+			<description>Use following interface configuration intead of internal system configuration (/usr/local/etc/sockd.conf)</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<name>Dante Settings</name>
 			<type>listtopic</type>
 		</field>

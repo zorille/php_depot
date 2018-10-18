@@ -38,17 +38,6 @@
           <ext_key_to_remote>physicalinterface_port</ext_key_to_remote>
           <duplicates>false</duplicates>
         </field>
-		<!--<field id="redundancy" xsi:type="AttributeRedundancySettings">
-          <sql>redundancy</sql>
-          <relation_code>impacts</relation_code>
-          <from_class>PhysicalInterface</from_class>
-          <neighbour_id>virtualswitch</neighbour_id>
-          <enabled>false</enabled>
-          <enabled_mode>user</enabled_mode>
-          <min_up>1</min_up>
-          <min_up_mode>user</min_up_mode>
-          <min_up_type>count</min_up_type>
-        </field>-->
       </fields>
       <presentation>
         <details _delta="define">
