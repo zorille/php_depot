@@ -1,5 +1,9 @@
 pkg/dante.xml
 pkg/dante.inc
+www/dante/dante_clients_mgmt.php
+www/dante/dante_socks_mgmt.php
+www/dante/dante_routes_mgmt.php
+www/dante/dante_view_logs.php
 www/shortcuts/pkg_dante.inc
 /etc/inc/priv/dante.priv.inc
 %%DATADIR%%/info.xml

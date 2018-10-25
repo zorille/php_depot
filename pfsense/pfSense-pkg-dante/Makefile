@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	pfSense-pkg-dante
-PORTVERSION=	0.1
+PORTVERSION=	0.2
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -25,11 +25,20 @@ do-extract:
 
 do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/dante
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/shortcuts
 	${MKDIR} ${STAGEDIR}/etc/inc/priv
 	${MKDIR} ${STAGEDIR}${DATADIR}
-	${INSTALL_DATA} -m 0644 ${FILESDIR}${PREFIX}/pkg/dante.xml \
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/dante.xml \
 		${STAGEDIR}${PREFIX}/pkg
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/dante/dante_clients_mgmt.php \
+		${STAGEDIR}${PREFIX}/www/dante
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/dante/dante_socks_mgmt.php \
+		${STAGEDIR}${PREFIX}/www/dante
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/dante/dante_routes_mgmt.php \
+		${STAGEDIR}${PREFIX}/www/dante
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/dante/dante_view_logs.php \
+		${STAGEDIR}${PREFIX}/www/dante
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/shortcuts/pkg_dante.inc \
 		${STAGEDIR}${PREFIX}/www/shortcuts
 	${INSTALL_DATA} ${FILESDIR}/etc/inc/priv/dante.priv.inc \
