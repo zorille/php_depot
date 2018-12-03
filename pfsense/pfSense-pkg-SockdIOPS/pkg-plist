@@ -1,0 +1,24 @@
+pkg/SockdIOPS.xml
+pkg/SockdIOPS/SockdIOPS.inc
+pkg/SockdIOPS/network.inc
+pkg/SockdIOPS/Assign.inc
+pkg/SockdIOPS/AttributeBag.inc
+pkg/SockdIOPS/AttributeSet.inc
+pkg/SockdIOPS/BaseInstruction.inc
+pkg/SockdIOPS/Digraph.inc
+pkg/SockdIOPS/DirectedEdge.inc
+pkg/SockdIOPS/Edge.inc
+pkg/SockdIOPS/Graph.inc
+pkg/SockdIOPS/InstructionInterface.inc
+pkg/SockdIOPS/Node.inc
+pkg/SockdIOPS/RawText.inc
+pkg/SockdIOPS/Subgraph.inc
+www/SockdIOPS/SockdIOPS_clients_mgmt.php
+www/SockdIOPS/SockdIOPS_socks_mgmt.php
+www/SockdIOPS/SockdIOPS_routes_mgmt.php
+www/SockdIOPS/SockdIOPS_view_logs.php
+www/SockdIOPS/SockdIOPS_view_network.php
+www/shortcuts/pkg_SockdIOPS.inc
+/etc/inc/priv/SockdIOPS.priv.inc
+%%DATADIR%%/info.xml
+@dir /etc/inc/priv

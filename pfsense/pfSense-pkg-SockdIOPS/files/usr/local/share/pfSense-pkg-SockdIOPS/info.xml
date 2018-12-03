@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<pfsensepkgs>
+	<package>
+		<name>SockdIOPS</name>
+		<internal_name>sockdiops</internal_name>
+		<descr><![CDATA[Gestion de la configuration de SockdIOPS.]]></descr>
+		<website></website>
+		<version>0.1.1</version>
+		<configurationfile>SockdIOPS.xml</configurationfile>
+	</package>
+</pfsensepkgs>
