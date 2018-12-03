@@ -1,0 +1,10 @@
+<acl>
+    <page-services-xinetd>
+        <name>Services: Xinetd</name>
+        <patterns>
+            <pattern>ui/xinetd/*</pattern>
+            <pattern>api/xinetd/*</pattern>
+            <pattern>diag_logs_xinetd.php</pattern>
+        </patterns>
+    </page-services-xinetd>
+</acl>

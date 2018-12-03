@@ -1,0 +1,130 @@
+<model>
+	<mount>//OPNsense/xinetd/configfiles</mount>
+	<description>Manage Xinetd Config Files</description>
+	<version>1.1.0</version>
+	<items>
+		<configfiles>
+			<configfile type="ArrayField">
+				<serviceName type="TextField">
+					<default></default>
+					<Required>Y</Required>
+				</serviceName>
+				<disable type="BooleanField">
+					<default>0</default>
+					<Required>Y</Required>
+				</disable>
+				<flags type="OptionField">
+					<default></default>
+					<OptionValues>
+						<INTERCEPT>INTERCEPT</INTERCEPT>
+						<NORETRY>NORETRY</NORETRY>
+						<IDONLY>IDONLY</IDONLY>
+						<NAMEINARGS>NAMEINARGS</NAMEINARGS>
+						<NODELAY>NODELAY</NODELAY>
+						<KEEPALIVE>KEEPALIVE</KEEPALIVE>
+						<NOLIBWRAP>NOLIBWRAP</NOLIBWRAP>
+						<SENSOR>SENSOR</SENSOR>
+						<IPv4>IPv4</IPv4>
+						<IPv6>IPv6</IPv6>
+						<LABELED>LABELED</LABELED>
+					</OptionValues>
+					<multiple>Y</multiple>
+				</flags>
+				<type type="OptionField">
+					<default></default>
+					<OptionValues>
+						<RPC>RPC</RPC>
+						<INTERNAL>INTERNAL</INTERNAL>
+						<TCPMUX>TCPMUX/TCPMUXPLUS</TCPMUX>
+						<UNLISTED>UNLISTED</UNLISTED>
+					</OptionValues>
+					<multiple>Y</multiple>
+				</type>
+				<socketType type="OptionField">
+					<default></default>
+					<OptionValues>
+						<stream>stream</stream>
+						<dgram>dgram</dgram>
+						<raw>raw</raw>
+						<seqpacket>seqpacket</seqpacket>
+					</OptionValues>
+					<multiple>N</multiple>
+				</socketType>
+				<protocol type="TextField">
+					<default></default>
+				</protocol>
+				<wait type="BooleanField">
+					<default>0</default>
+					<Required>Y</Required>
+				</wait>
+				<user type="TextField">
+					<default></default>
+				</user>
+				<group type="TextField">
+					<default></default>
+				</group>
+				<instances type="IntegerField">
+					<default></default>
+					<MinimumValue>0</MinimumValue>
+					<MaximumValue>65535</MaximumValue>
+				</instances>
+				<nice type="IntegerField">
+					<default></default>
+				</nice>
+				<server type="TextField">
+					<default></default>
+				</server>
+				<serverArgs type="TextField">
+					<default></default>
+				</serverArgs>
+				<onlyFrom type="TextField">
+					<default></default>
+				</onlyFrom>
+				<listenAddress type="InterfaceField">
+					<default></default>
+					<AddParentDevices>Y</AddParentDevices>
+					<filters>
+						<enable>/^(?!0).*$/</enable>
+						<type>/(?s)^((?!group).)*$/</type>
+					</filters>
+					<!-- <showvirtualips/> <showips/> -->
+				</listenAddress>
+				<listenLocalhost type="BooleanField">
+					<default>0</default>
+				</listenLocalhost>
+				<listenPort type="IntegerField">
+					<default></default>
+					<MinimumValue>0</MinimumValue>
+					<MaximumValue>65535</MaximumValue>
+				</listenPort>
+				<logType type="TextField">
+					<default></default>
+				</logType>
+				<logOnSuccess type="OptionField">
+					<default></default>
+					<OptionValues>
+						<duration>DURATION</duration>
+						<exit>EXIT</exit>
+						<host>HOST</host>
+						<pid>PID</pid>
+						<traffic>TRAFFIC</traffic>
+						<userid>USERID</userid>
+					</OptionValues>
+					<multiple>Y</multiple>
+				</logOnSuccess>
+				<logOnFailure type="OptionField">
+					<default></default>
+					<OptionValues>
+						<attempt>ATTEMPT</attempt>
+						<host>HOST</host>
+						<userid>USERID</userid>
+					</OptionValues>
+					<multiple>Y</multiple>
+				</logOnFailure>
+				<cps type="TextField">
+					<default></default>
+				</cps>
+			</configfile>
+		</configfiles>
+	</items>
+</model>

@@ -1,0 +1,318 @@
+<form>
+	<field>
+		<label>Service Name</label>
+		<id>configfile.serviceName</id>
+		<help><![CDATA[Name of the service]]></help>
+		<type>text</type>
+	</field>
+	<field>
+		<label>Disable</label>
+		<id>configfile.disable</id>
+		<help><![CDATA[This is boolean "yes" or "no". This will result in the service being disabled and not starting. See the DISABLE flag description.]]></help>
+		<type>checkbox</type>
+	</field>
+	<field>
+		<label>Flags</label>
+		<id>configfile.flags</id>
+		<help><![CDATA[
+INTERCEPT 
+Intercept packets or accepted connections in order to verify that they are coming 
+from acceptable locations (internal or multi-threaded services cannot be intercepted). 
+NORETRY 
+Avoid retry attempts in case of fork failure. 
+IDONLY 
+Accept connections only when the remote end identifies the remote user (i.e. the remote 
+host must run an identification server). This flag applies only to connection-based 
+services. This flag is ineffective if the USERID log option is not used. 
+NAMEINARGS 
+This will cause the first argument in "server_args" to be argv[0] when executing the 
+server, as specified in "server". This allows you to use tcpd by putting tcpd in "server" 
+and the name of the server in "server_args" like in normal inetd. This flag has to be 
+specified before "server_args", otherwise is not taken into account. 
+NODELAY 
+If the service is a tcp service and the NODELAY flag is set, then the TCP_NODELAY flag 
+will be set on the socket. If the service is not a tcp service, this option has no effect. 
+KEEPALIVE 
+If the service is a tcp service and the KEEPALIVE flag is set, then the SO_KEEPALIVE 
+socket flag will be set on the socket. If the service is not a tcp service, this option has no effect. 
+NOLIBWRAP 
+This disables internal calling of the tcpwrap library to determine access to the service. 
+This may be needed in order to use libwrap functionality not available to long-running processes such as xinetd; in this case, the tcpd program can be called explicitly (see also the NAMEINARGS flag). For RPC services using TCP transport, this flag is automatically turned on, because xinetd cannot get remote host address information for the rpc port. 
+SENSOR 
+This replaces the service with a sensor that detects accesses to the specified port. 
+NOTE: It will NOT detect stealth scans. This flag should be used only on services that 
+you know you don't need. When an access is made to this service's port, the IP Address 
+is added to a global no_access list. This causes all subsequent accesses from the originating 
+IP address to be denied access until the deny_time setting expires. The amount of time spent 
+on this list is configurable as the deny_time attribute. The SENSOR flag will also cause xinetd 
+to consider the server attribute to be INTERNAL no matter what is typed on the same line.
+ Another important thing to remember is that if the socket_type is set to stream, 
+ then the wait attribute should be set to no. 
+IPv4 
+Sets the service to be an IPv4 service (AF_INET). 
+IPv6 
+Sets the service to be an IPv6 service (AF_INET6), if IPv6 is available on the system. 
+LABELED 
+The LABELED flag will tell xinetd to change the child processes SE Linux context to match 
+that of the incoming connection as it starts the service. This only works for external tcp 
+non-waiting servers and is an error if applied to an internal, udp, or tcp-wait server. 
+REUSE 
+The REUSE flag is deprecated. All services now implicitly use the REUSE flag. 
+		]]></help>
+		<type>select_multiple</type>
+	</field>
+	<field>
+		<label>Type</label>
+		<id>configfile.type</id>
+		<help><![CDATA[
+Any combination of the following values may be used: 
+
+RPC 
+if this is an RPC service 
+INTERNAL 
+if this is a service provided by xinetd. 
+TCPMUX/TCPMUXPLUS 
+if this is a service that will be started according to the RFC 1078 protocol on 
+the TCPMUX well-known port. See the section describing TCPMUX services below. 
+UNLISTED 
+if this is a service not listed in a standard system file 
+(like /etc/rpc for RPC services, or /etc/services for non-RPC services). 
+		]]></help>
+		<type>select_multiple</type>
+	</field>
+	<field>
+		<label>Socket Type</label>
+		<id>configfile.socketType</id>
+		<help><![CDATA[
+stream 
+stream-based service 
+dgram 
+datagram-based service 
+raw 
+service that requires direct access to IP 
+seqpacket 
+service that requires reliable sequential datagram transmission 
+		]]></help>
+		<type>dropdown</type>
+	</field>
+	<field>
+		<label>Protocol</label>
+		<id>configfile.protocol</id>
+		<help><![CDATA[determines the protocol that is employed by the service. 
+		The protocol must exist in /etc/protocols. If this attribute is not defined, 
+		the default protocol employed by the service will be used. 
+		]]></help>
+		<type>text</type>
+	</field>
+	<field>
+		<label>Wait</label>
+		<id>configfile.wait</id>
+		<help><![CDATA[
+This attribute determines if the service is single-threaded or multi-threaded 
+and whether or not xinetd accepts the connection or the server program accepts 
+the connection. If its value is yes, the service is single-threaded; this means 
+that xinetd will start the server and then it will stop handling requests for the 
+service until the server dies and that the server software will accept the connection. 
+If the attribute value is no, the service is multi-threaded and xinetd will keep 
+handling new service requests and xinetd will accept the connection. It should be 
+noted that udp/dgram services normally expect the value to be yes since udp is not 
+connection oriented, while tcp/stream servers normally expect the value to be no. 
+]]></help>
+		<type>checkbox</type>
+		<advanced>true</advanced>
+	</field>
+	<field>
+		<label>User</label>
+		<id>configfile.user</id>
+		<help><![CDATA[
+determines the uid for the server process. The user attribute can either be numeric 
+or a name. If a name is given (recommended), the user name must exist in /etc/passwd. 
+This attribute is ineffective if the effective user ID of xinetd is not super-user.  
+		]]></help>
+		<type>text</type>
+	</field>
+	<field>
+		<label>Group</label>
+		<id>configfile.group</id>
+		<help><![CDATA[
+determines the gid for the server process. The group attribute can either be numeric 
+or a name. If a name is given (recommended), the group name must exist in /etc/group. 
+If a group is not specified, the group of user will be used (from /etc/passwd). This 
+attribute is ineffective if the effective user ID of xinetd is not super-user and if 
+the groups attribute is not set to 'yes'. 
+		]]></help>
+		<type>text</type>
+		<advanced>true</advanced>
+	</field>
+	<field>
+		<label>Instances</label>
+		<id>configfile.instances</id>
+		<help><![CDATA[
+determines the number of servers that can be simultaneously active for a service (the default is no limit). 
+The value of this attribute can be either a number or UNLIMITED which means that there is no limit. 
+		]]></help>
+		<type>text</type>
+		<advanced>true</advanced>
+	</field>
+	<field>
+		<label>Nice</label>
+		<id>configfile.nice</id>
+		<help><![CDATA[
+determines the server priority. Its value is a (possibly negative) number; check nice(3) for more information.
+		]]></help>
+		<type>text</type>
+		<advanced>true</advanced>
+	</field>
+	<field>
+		<label>Server</label>
+		<id>configfile.server</id>
+		<help><![CDATA[
+determines the program to execute for this service.
+		]]></help>
+		<type>text</type>
+	</field>
+	<field>
+		<label>Server Args</label>
+		<id>configfile.serverArgs</id>
+		<help><![CDATA[
+determines the arguments passed to the server. In contrast to inetd, the server name should not be included in server_args. 
++.B libwrap
+overrides the service name passed to libwrap (which defaults to the server name, the first server_args 
+component with NAMEINARGS, the id for internal services and the service name for redirected services). 
+This attribute is only valid if xinetd has been configured with the libwrap option. 
+		]]></help>
+		<type>text</type>
+	</field>
+	<field>
+		<label>Only From</label>
+		<id>configfile.onlyFrom</id>
+		<help><![CDATA[
+determines the remote hosts to which the particular service is available. 
+Its value is a list of IP addresses which can be specified in any combination of the following ways: 
+
+a) 
+a numeric address in the form of %d.%d.%d.%d. If the rightmost components are 0, they are treated 
+as wildcards (for example, 128.138.12.0 matches all hosts on the 128.138.12 subnet). 0.0.0.0 matches 
+all Internet addresses. IPv6 hosts may be specified in the form of abcd:ef01::2345:6789. The rightmost 
+rule for IPv4 addresses does not apply to IPv6 addresses. 
+b) 
+a factorized address in the form of %d.%d.%d.{%d,%d,...}. There is no need for all 4 components 
+(i.e. %d.%d.{%d,%d,...%d} is also ok). However, the factorized part must be at the end of the address. 
+This form does not work for IPv6 hosts. 
+c) 
+a network name (from /etc/networks). This form does not work for IPv6 hosts. 
+d) 
+a host name. When a connection is made to xinetd, a reverse lookup is performed, and the canonical name 
+returned is compared to the specified host name. You may also use domain names in the form of .domain.com. 
+If the reverse lookup of the client's IP is within .domain.com, a match occurs. 
+e) 
+an ip address/netmask range in the form of 1.2.3.4/32. IPv6 address/netmask ranges in the form of 1234::/46 are also valid. 
+
+Specifying this attribute without a value makes the service available to nobody. 
+		]]></help>
+		<type>text</type>
+		<advanced>true</advanced>
+	</field>
+	<field>
+		<label>Listen Interfaces</label>
+		<id>configfile.listenAddress</id>
+		<help><![CDATA[Select the internal interfaces, such as LAN, where Xinetd listen]]></help>
+		<type>select_multiple</type>
+	</field>
+	<field>
+		<label>Listen localhost</label>
+		<id>configfile.listenLocalhost</id>
+		<help><![CDATA[Select if Xinetd must listen localhost (Listen Interface have priority.]]></help>
+		<type>checkbox</type>
+	</field>
+	<field>
+		<label>Listen Port</label>
+		<id>configfile.listenPort</id>
+		<help><![CDATA[Listen port for connections to Privoxy]]></help>
+		<type>text</type>
+	</field>
+	<field>
+		<label>Redirect</label>
+		<id>configfile.redirect</id>
+		<help><![CDATA[
+Allows a tcp service to be redirected to another host. When xinetd 
+receives a tcp connection on this port it spawns a process that 
+establishes a connection to the host and port number specified, 
+and forwards all data between the two hosts. This option is useful 
+when your internal machines are not visible to the outside world. 
+Syntax is: redirect = (ip address) (port). You can also use a hostname 
+instead of the IP address in this field. The hostname lookup is performed 
+only once, when xinetd is started, and the first IP address returned 
+is the one that is used until xinetd is restarted. The "server" 
+attribute is not required when this option is specified. 
+If the "server" attribute is specified, this attribute takes priority. 
+		]]></help>
+		<type>text</type>
+		<advanced>true</advanced>
+	</field>
+	<field>
+		<label>Log Type</label>
+		<id>configfile.logType</id>
+		<help><![CDATA[Configures xinetd to use the authpriv log facility, which writes log entries to the /var/log/secure file. Adding a directive such as FILE /var/log/xinetdlog would create a custom log file called xinetdlog in the /var/log/ directory.
+SYSLOG syslog_facility [syslog_level] 
+The log output is sent to syslog at the specified facility. 
+Possible facility names include: daemon, auth, authpriv, user, 
+mail, lpr, news, uucp, ftp local0-7. Possible level names 
+include: emerg, alert, crit, err, warning, notice, info, debug. 
+If a level is not present, the messages will be recorded at the info level.
+
+FILE file [soft_limit [hard_limit]] 
+The log output is appended to file which will be created if it 
+does not exist. Two limits on the size of the log file can be 
+optionally specified. The first limit is a soft one; xinetd will 
+log a message the first time this limit is exceeded (if xinetd 
+logs to syslog, the message will be sent at the alert priority 
+level). The second limit is a hard limit; xinetd will stop 
+logging for the affected service (if the log file is a common log 
+file, then more than one service may be affected) and will log a 
+message about this (if xinetd logs to syslog, the message will be 
+sent at the alert priority level). If a hard limit is not specified, 
+it defaults to the soft limit increased by 1% but the extra size must 
+be within the parameters LOG_EXTRA_MIN and LOG_EXTRA_MAX which default 
+to 5K and 20K respectively (these constants are defined in xconfig.h). 
+		]]></help>
+		<type>text</type>
+		<advanced>true</advanced>
+	</field>
+	<field>
+		<label>Log On Success</label>
+		<id>configfile.logOnSuccess</id>
+		<help><![CDATA[Configures xinetd to log if the connection is successful. By default, the remote host's IP address and the process ID of server processing the request are recorded.
+Below is a list of some of the more commonly used logging options: 
+
+DURATION — Logs the length of time the service is used by a remote system. 
+EXIT — Logs the exit status or termination signal of the service. 
+HOST — Logs the remote host's IP address. 
+PID — Logs the process ID of the server receiving the request. 
+USERID — Logs the remote user using the method defined in RFC 1413 for all multi-threaded stream services. 
+TRAFFIC — logs the total bytes in and out for a redirected service.
+		]]></help>
+		<type>select_multiple</type>
+		<advanced>true</advanced>
+	</field>
+	<field>
+		<label>Log On Failure</label>
+		<id>configfile.logOnFailure</id>
+		<help><![CDATA[Configures xinetd to log if there is a connection failure or if the connection is not allowed.
+		Below is a list of some of the more commonly used logging options: 
+
+ATTEMPT — Logs the fact that a failed attempt was made. 
+HOST — Logs the remote host's IP address.  
+USERID — Logs the remote user using the method defined in RFC 1413 for all multi-threaded stream services. 
+		]]></help>
+		<type>select_multiple</type>
+		<advanced>true</advanced>
+	</field>
+	<field>
+		<label>Connexion Per Second</label>
+		<id>configfile.cps</id>
+		<help><![CDATA[Configures xinetd to allow no more than 25 connections per second to any given service. If this limit is reached, the service is retired for 30 seconds.]]></help>
+		<type>text</type>
+		<advanced>true</advanced>
+	</field>
+</form>

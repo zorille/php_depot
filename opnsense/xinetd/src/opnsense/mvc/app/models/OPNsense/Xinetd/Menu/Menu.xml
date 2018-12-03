@@ -1,0 +1,8 @@
+<menu>
+    <Services>
+      <Xinetd VisibleName="Xinetd" cssClass="fa fa-map-signs fa-fw">
+          <Settings order="10" url="/ui/xinetd/general/index" />
+          <Log VisibleName="Log File" order="50" url="/diag_logs_xinetd.php"/>
+      </Xinetd>
+    </Services>
+</menu>

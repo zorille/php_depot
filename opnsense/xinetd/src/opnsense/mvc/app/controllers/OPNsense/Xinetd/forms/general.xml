@@ -1,0 +1,81 @@
+<form>
+	<field>
+		<label>Enabled</label>
+		<id>general.enabled</id>
+		<help><![CDATA[Enable Privoxy service.]]></help>
+		<type>checkbox</type>
+	</field>
+	<field>
+		<label>Confs Directory</label>
+		<id>general.includedir</id>
+		<help><![CDATA[The directory where the other configuration files are located.]]></help>
+		<type>text</type>
+	</field>
+	<field>
+		<label>Instances</label>
+		<id>general.instances</id>
+		<help><![CDATA[Sets the maximum number of requests xinetd can handle at once.]]></help>
+		<type>text</type>
+	</field>
+	<field>
+		<label>Log Type</label>
+		<id>general.logType</id>
+		<help><![CDATA[Configures xinetd to use the authpriv log facility, which writes log entries to the /var/log/secure file. Adding a directive such as FILE /var/log/xinetdlog would create a custom log file called xinetdlog in the /var/log/ directory.
+SYSLOG syslog_facility [syslog_level] 
+The log output is sent to syslog at the specified facility. 
+Possible facility names include: daemon, auth, authpriv, user, 
+mail, lpr, news, uucp, ftp local0-7. Possible level names 
+include: emerg, alert, crit, err, warning, notice, info, debug. 
+If a level is not present, the messages will be recorded at the info level.
+
+FILE file [soft_limit [hard_limit]] 
+The log output is appended to file which will be created if it 
+does not exist. Two limits on the size of the log file can be 
+optionally specified. The first limit is a soft one; xinetd will 
+log a message the first time this limit is exceeded (if xinetd 
+logs to syslog, the message will be sent at the alert priority 
+level). The second limit is a hard limit; xinetd will stop 
+logging for the affected service (if the log file is a common log 
+file, then more than one service may be affected) and will log a 
+message about this (if xinetd logs to syslog, the message will be 
+sent at the alert priority level). If a hard limit is not specified, 
+it defaults to the soft limit increased by 1% but the extra size must 
+be within the parameters LOG_EXTRA_MIN and LOG_EXTRA_MAX which default 
+to 5K and 20K respectively (these constants are defined in xconfig.h). 
+		]]></help>
+		<type>text</type>
+	</field>
+	<field>
+		<label>Log On Success</label>
+		<id>general.logOnSuccess</id>
+		<help><![CDATA[Configures xinetd to log if the connection is successful. By default, the remote host's IP address and the process ID of server processing the request are recorded.
+Below is a list of some of the more commonly used logging options: 
+
+DURATION — Logs the length of time the service is used by a remote system. 
+EXIT — Logs the exit status or termination signal of the service. 
+HOST — Logs the remote host's IP address. 
+PID — Logs the process ID of the server receiving the request. 
+USERID — Logs the remote user using the method defined in RFC 1413 for all multi-threaded stream services. 
+TRAFFIC — logs the total bytes in and out for a redirected service.
+		]]></help>
+		<type>select_multiple</type>
+	</field>
+	<field>
+		<label>Log On Failure</label>
+		<id>general.logOnFailure</id>
+		<help><![CDATA[Configures xinetd to log if there is a connection failure or if the connection is not allowed.
+		Below is a list of some of the more commonly used logging options: 
+
+ATTEMPT — Logs the fact that a failed attempt was made. 
+HOST — Logs the remote host's IP address.  
+USERID — Logs the remote user using the method defined in RFC 1413 for all multi-threaded stream services. 
+		]]></help>
+		<type>select_multiple</type>
+	</field>
+	<field>
+		<label>Connexion Per Second</label>
+		<id>general.cps</id>
+		<help><![CDATA[Configures xinetd to allow no more than 25 connections per second to any given service. If this limit is reached, the service is retired for 30 seconds.]]></help>
+		<type>text</type>
+	</field>
+</form>

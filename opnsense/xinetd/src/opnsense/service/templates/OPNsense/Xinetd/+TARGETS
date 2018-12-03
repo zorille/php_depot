@@ -1,0 +1,2 @@
+xinetd.conf:/usr/local/etc/xinetd.conf
+rc.conf.d:/etc/rc.conf.d/xinetd

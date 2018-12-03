@@ -1,0 +1,47 @@
+<model>
+	<mount>//OPNsense/xinetd/general</mount>
+	<description>Opnsense Package to manage Xinetd Services</description>
+	<version>1.1.0</version>
+	<items>
+		<enabled type="BooleanField">
+			<default>0</default>
+			<Required>Y</Required>
+		</enabled>
+		<includedir type="TextField">
+			<Required>Y</Required>
+			<default>/usr/local/etc/xinetd.d</default>
+		</includedir>
+		<instances type="IntegerField">
+			<default></default>
+			<MinimumValue>0</MinimumValue>
+			<MaximumValue>65535</MaximumValue>
+		</instances>
+		<logType type="TextField">
+			<default></default>
+		</logType>
+		<logOnSuccess type="OptionField">
+			<default></default>
+			<OptionValues>
+				<duration>DURATION</duration>
+				<exit>EXIT</exit>
+				<host>HOST</host>
+				<pid>PID</pid>
+				<traffic>TRAFFIC</traffic>
+				<userid>USERID</userid>
+			</OptionValues>
+			<multiple>Y</multiple>
+		</logOnSuccess>
+		<logOnFailure type="OptionField">
+			<default></default>
+			<OptionValues>
+				<attempt>ATTEMPT</attempt>
+				<host>HOST</host>
+				<userid>USERID</userid>
+			</OptionValues>
+			<multiple>Y</multiple>
+		</logOnFailure>
+		<cps type="TextField">
+			<default></default>
+		</cps>
+	</items>
+</model>
