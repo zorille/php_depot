@@ -1,0 +1,9 @@
+<menu>
+    <Services>
+      <SockdIOPS VisibleName="SockdIOPS" cssClass="fa fa-sitemap fa-fw">
+          <Settings order="10" url="/ui/sockdiops/sockdglobal/index" />
+          <Graph VisibleName="Network Graph" order="40" url="/diag_graph_sockdiops.php"/>
+          <Log VisibleName="Log File" order="50" url="/diag_logs_sockdiops.php"/>
+      </SockdIOPS>
+    </Services>
+</menu>

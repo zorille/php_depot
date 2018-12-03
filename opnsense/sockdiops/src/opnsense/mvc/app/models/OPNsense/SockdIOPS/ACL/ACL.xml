@@ -1,0 +1,11 @@
+<acl>
+    <page-services-sockdiops>
+        <name>Services: SockdIOPS</name>
+        <patterns>
+            <pattern>ui/sockdiops/*</pattern>
+            <pattern>api/sockdiops/*</pattern>
+            <pattern>diag_graph_sockdiops.php</pattern>
+            <pattern>diag_logs_sockdiops.php</pattern>
+        </patterns>
+    </page-services-sockdiops>
+</acl>

@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# $FreeBSD$
+#
+#
+# PROVIDE: sockdiops
+# REQUIRE: DAEMON
+# BEFORE: LOGIN
+#
+# This rc script understands the following variables
+# which are read from /etc/rc.conf:
+#
+# sockdiops_enable  (bool): Set to "NO" by default.
+#                         Set it to "YES" to enable Privoxy.
+# sockdiops_config   (str): Privoxy's configuration file. Default is:
+#                         /usr/local/etc/sockd/config.
+# sockdiops_flags    (str): List of additional Privoxy options you want
+#                         to use. None set by default.
+# sockdiops_pidfile  (str): Default is /var/run/sockd/sockd.pid.
+# sockdiops_user     (str): Privoxy Daemon user. Default is sockd.
+#
+# Usage:
+# /usr/local/etc/rc.d/sockdiops [fast|force|one](start|stop|restart|rcvar|status|poll)
+
+. /etc/rc.subr
+
+name="sockdiops"
+rcvar=sockdiops_enable
+load_rc_config ${name}
+
+: ${sockdiops_enable="NO"}
+: ${sockdiops_config="/usr/local/etc/SockdIOPS/sockdiops.conf"}
+: ${sockdiops_logdir="/var/log/SockdIOPS_opnsense"}
+: ${sockdiops_user="proxy"}
+: ${sockdiops_piddir="/var/run/SockdIOPS_opnsense"}
+: ${sockdiops_pidfile="${sockdiops_piddir}/sockdiops.pid"}
+
+sockdiops_prestart () {
+    if [ ! -e "${sockdiops_config}" ]; then
+        echo "config file not found. Copying the example file to ${sockdiops_config}."
+    fi
+    if [ ! -e "${sockdiops_logdir}" ]; then
+        echo "${sockdiops_logdir} not found. Creating ..."
+        mkdir "${sockdiops_logdir}"
+        chown "${sockdiops_user}:${sockdiops_user}" "${sockdiops_logdir}"
+        chmod 0750 "${sockdiops_logdir}"
+    fi
+    if [ ! -d "${sockdiops_piddir}" ]; then
+        mkdir -p "${sockdiops_piddir}"
+        chown "${sockdiops_user}:${sockdiops_user}" "${sockdiops_piddir}"
+    fi
+}
+
+start_precmd="sockdiops_prestart"
+
+command="/usr/local/sbin/sockdiops"
+command_args="${sockdiops_flags} -D -p ${sockdiops_pidfile} -f ${sockdiops_config}"
+
+run_rc_command "$1"

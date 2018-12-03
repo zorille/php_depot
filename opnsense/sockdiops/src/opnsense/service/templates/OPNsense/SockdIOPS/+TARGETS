@@ -1,0 +1,2 @@
+sockdiops.conf:/usr/local/etc/SockdIOPS/sockdiops.conf
+rc.conf.d:/etc/rc.conf.d/sockdiops
