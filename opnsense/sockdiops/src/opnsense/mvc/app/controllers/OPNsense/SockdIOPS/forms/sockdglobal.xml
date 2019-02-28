@@ -47,7 +47,7 @@ same-same indicates the source address for a given destination should be the sam
 	</field>
 	<field>
 		<label>DNS not used</label>
-		<id>sockdglobal.global.resolveprotocol</id>
+		<id>sockdglobal.global.dnsresolvdst</id>
 		<help><![CDATA[Bypass DNS resolve during Socks and Routes]]></help>
 		<type>checkbox</type>
 	</field>

@@ -93,12 +93,12 @@ class SockdGlobal extends GlobalModel
     	return 'external.rotation: none'."\n";
     }
     
-    private function ResolveProtocolLine()
+    private function DnsResolveDstLine()
     {
-    	if ((string)$this->global->resolveprotocol === "1") {
-    		return 'resolveprotocol: fake';
+    	if ((string)$this->global->dnsresolvdst === "1") {
+    		return 'dnsresolvdst: yes';
     	}
-    	return '';
+    	return 'dnsresolvdst: no';
     }
     
     private function srcHostLine(){
@@ -162,7 +162,7 @@ class SockdGlobal extends GlobalModel
     	$clientmethod=(string)$this->global->clientMethod;
     	$userprivileged=(string)$this->global->userPrivileged;
     	$userunprivileged=(string)$this->global->userUnPrivileged;
-    	$resolveprotocol=$this->ResolveProtocolLine();
+    	$dnsresolvdst=$this->DnsResolveDstLine();
     	$srcHost = $this->srcHostLine();
     	$clienttimeout=(string)$this->global->clientTimeout;
     	$sockettimeout=(string)$this->global->socketTimeout;
@@ -185,7 +185,7 @@ clientmethod: {$clientmethod}
 user.privileged: {$userprivileged}
 user.unprivileged: {$userunprivileged}
 {$srcHost}
-{$resolveprotocol}
+{$dnsresolvdst}
 
 timeout.io: {$clienttimeout}
 timeout.negotiate: {$sockettimeout}

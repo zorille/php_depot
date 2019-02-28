@@ -48,9 +48,9 @@
 				</OptionValues>
 				<Required>Y</Required>
 			</externalRotation>
-			<resolveprotocol type="BooleanField">
+			<dnsresolvdst type="BooleanField">
 				<default>0</default>
-			</resolveprotocol>
+			</dnsresolvdst>
 			<srcHost type="OptionField">
 				<default>none</default>
 				<multiple>Y</multiple>
