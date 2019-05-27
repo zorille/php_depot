@@ -79,7 +79,7 @@ abstract class MasterModel extends BaseModel
 		return '';
 	}
 	
-	protected function getInterfaceName($opnsenseInterfacesList){
+	protected function getInterfaceIP($opnsenseInterfacesList){
 		if(is_array($opnsenseInterfacesList)) {
 			foreach($opnsenseInterfacesList as $interface){
 				if($interface['selected']==1){
@@ -92,16 +92,16 @@ abstract class MasterModel extends BaseModel
 	}
 	
 	/**
-	 * collect interface names
+	 * collect interface IP
 	 * @return array interface mapping (raw interface to description)
 	 */
-	private function getInterfaceNames() {
+	private function getInterfaceIPV4() {
 		$intfmap = array();
 		$config = Config::getInstance()->object();
 		if ($config->interfaces->count() > 0) {
 			foreach ($config->interfaces->children() as $key => $node) {
 				$nom = !empty((string)$node->descr) ? (string)$node->descr : $key;
-				$intfmap[strtolower($nom)] = (string)$node->if;
+				$intfmap[strtolower($nom)] = (string)$node->ipaddr;
 			}
 		}
 		$this->setSystemInterfaces($intfmap);
@@ -112,7 +112,7 @@ abstract class MasterModel extends BaseModel
 			$interface_name) {
 				$interfaces=$this->getSystemInterfaces();
 				if(empty($interfaces)){
-					$interfaces=$this->getInterfaceNames();
+					$interfaces=$this->getInterfaceIPV4();
 				}
 				if(isset($interfaces[$interface_name])){
 					return $interfaces[$interface_name];
@@ -134,5 +134,31 @@ abstract class MasterModel extends BaseModel
 		$this->system_interfaces=$interfaces;
 		return $this;
 	}
-
+	
+	/**
+	 * get configuration state
+	 * @return bool
+	 */
+	public function configChanged()
+	{
+		return file_exists("/tmp/privoxy.dirty");
+	}
+	
+	/**
+	 * mark configuration as changed
+	 * @return bool
+	 */
+	public function configDirty()
+	{
+		return @touch("/tmp/privoxy.dirty");
+	}
+	
+	/**
+	 * mark configuration as consistent with the running config
+	 * @return bool
+	 */
+	public function configClean()
+	{
+		return @unlink("/tmp/privoxy.dirty");
+	}
 }

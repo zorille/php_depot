@@ -142,6 +142,7 @@ class ServiceController extends ApiControllerBase
 
             // generate template
             $mdlServer->generatePrivoxyConf();
+            //Replace config by generated template
             $backend->configdRun('template reload OPNsense/Privoxy');
 
             // (res)start daemon
@@ -152,10 +153,23 @@ class ServiceController extends ApiControllerBase
                     $this->startAction();
                 }
             }
+            //Remove dirty
+            $mdlServer->configClean();
 
             return array("status" => "ok");
         } else {
             return array("status" => "failed");
         }
+    }
+    
+    /**
+     * Valid dirty
+     */
+    public function dirtyAction()
+    {
+    	$result = array('status' => 'ok');
+    	$mdlServer = new General();
+    	$result['privoxy']['dirty'] = $mdlServer->configChanged();
+    	return $result;
     }
 }

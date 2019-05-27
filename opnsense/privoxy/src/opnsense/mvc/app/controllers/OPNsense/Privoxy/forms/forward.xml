@@ -9,7 +9,8 @@
 	<field>
 		<label>Forward Type: </label>
 		<id>forward.ruleType</id>
-		<help><![CDATA[Select if the rule is Pass or Block]]></help>
+		<help><![CDATA[Select forward Socks type.
+Socks5t means Socks5 TOR]]></help>
 		<type>dropdown</type>
 	</field>
 	<field>

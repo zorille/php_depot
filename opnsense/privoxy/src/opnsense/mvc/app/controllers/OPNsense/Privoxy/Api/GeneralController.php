@@ -43,4 +43,10 @@ class GeneralController extends ApiMutableModelControllerBase
 {
     static protected $internalModelName = 'general';
     static protected $internalModelClass = '\OPNsense\Privoxy\General';
+   
+    public function setAction(){
+    	$mdlServer = new General();
+    	$mdlServer->configDirty();
+    	return parent::setAction();
+    }
 }

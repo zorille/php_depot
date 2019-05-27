@@ -33,6 +33,7 @@
             formatTokenizersUI();
             $('.selectpicker').selectpicker('refresh');
             updateServiceControlUI('privoxy');
+            isSubsystemDirty();
         });
 
         ajaxCall(url="/api/privoxy/service/status", sendData={}, callback=function (data, status) {
@@ -43,21 +44,43 @@
         $("#saveAct").click(function () {
             saveFormToEndpoint(url="/api/privoxy/general/set", formid='frm_general_settings',callback_ok=function () {
             });
+            isSubsystemDirty();
         });
 
         /*************************************************************************************************************
          * Commands
          *************************************************************************************************************/
-
+		  /**
+	       * get the isSubsystemDirty value and print a notice
+	       */
+	      function isSubsystemDirty() {
+	         ajaxGet(url="/api/privoxy/service/dirty", sendData={}, callback=function(data,status) {
+	            if (status == "success") {
+	               if (data.privoxy.dirty === true) {
+	                  $("#configChangedMsg").removeClass("hidden");
+	               } else {
+	                  $("#configChangedMsg").addClass("hidden");
+	               }
+	            }
+	         });
+	      }
+	      
+	      /**
+	       * chain std_bootgrid_reload from opnsense_bootgrid_plugin.js
+	       * to get the isSubsystemDirty state on "UIBootgrid" changes
+	       */
+	      var opn_std_bootgrid_reload = std_bootgrid_reload;
+	      std_bootgrid_reload = function(gridId) {
+	         opn_std_bootgrid_reload(gridId);
+	         isSubsystemDirty();
+	      };
+      
         /**
          * Reconfigure
-         */
-        $("#reconfigureAct").click(function(){
-            $("#reconfigureAct_progress").addClass("fa fa-spinner fa-pulse");
+         */        
+        $("#btnApplyConfig").unbind('click').click(function(){
+            $("#btnApplyConfigProgress").addClass("fa fa-spinner fa-pulse");
             ajaxCall(url="/api/privoxy/service/reconfigure", sendData={}, callback=function(data,status) {
-                // when done, disable progress animation.
-                $("#reconfigureAct_progress").removeClass("fa fa-spinner fa-pulse");
-
                 if (status != "success" || data['status'] != 'ok') {
                     BootstrapDialog.show({
                         type: BootstrapDialog.TYPE_WARNING,
@@ -65,11 +88,19 @@
                         message: data['status'],
                         draggable: true
                     });
+                    //On stoppe le pulse
+                    $("#btnApplyConfigProgress").removeClass("fa fa-spinner fa-pulse");
                 } else {
-                    ajaxCall(url="/api/privoxy/service/reconfigure", sendData={});
+                	//On stoppe le pulse
+                	$("#btnApplyConfigProgress").removeClass("fa fa-spinner fa-pulse");
+                	//On cache le bouton
+                	$('#btnApplyConfig').blur();
+                	//On valide le nettoyage
+                	isSubsystemDirty();
                 }
             });
         });
+    	
         // update history on tab state and implement navigation
     	if(window.location.hash != "") {
         	$('a[href="' + window.location.hash + '"]').click()
@@ -80,12 +111,10 @@
     });
 </script>
 
-<div class="content-box" style="padding-bottom: 1.5em;">
-            <div class="col-md-12">
-            	<br/>
-        		<button class="btn btn-primary" id="reconfigureAct" type="button"><b>{{ lang._('Apply') }}</b> <i id="reconfigureAct_progress" class=""></i></button>
-    		</div>
-        </div>
+<div class="alert alert-info hidden" role="alert" id="configChangedMsg">
+   <button class="btn btn-primary pull-right" id="btnApplyConfig" type="button"><b>{{ lang._('Apply changes') }}</b> <i id="btnApplyConfigProgress"></i></button>
+   {{ lang._('The Privoxy configuration has been changed') }} <br /> {{ lang._('You must apply the changes in order for them to take effect.')}}
+</div>
 
 <div class="tab-content content-box tab-content">
     <div id="general" class="tab-pane fade in active">

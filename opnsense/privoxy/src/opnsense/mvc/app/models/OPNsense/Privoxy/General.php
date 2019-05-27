@@ -104,7 +104,7 @@ class General extends MasterModel
     	foreach ( $this->listenAddress->getFlatNodes() as $item ) {
     		foreach($item->getNodeData() as $interface){
     			if($interface['selected']==1){
-    				return "listen-address " . $this->getInterfaceName(array($interface)) . ":". $this->listenPort;
+    				return "listen-address " . $this->getInterfaceIP(array($interface)) . ":". $this->listenPort;
     			}
     		}
     	}

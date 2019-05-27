@@ -34,6 +34,7 @@ use \OPNsense\Base\ApiMutableModelControllerBase;
 use \OPNsense\Base\UIModelGrid;
 use \OPNsense\Core\Config;
 use \OPNsense\Privoxy\MiscFiles;
+use \OPNsense\Privoxy\General;
 
 /**
  * Class MiscFilesController
@@ -56,21 +57,29 @@ class MiscFilesController extends \OPNsense\Privoxy\MasterController
     
     public function addMiscFilesAction()
     {
+    	$mdlServer = new General();
+    	$mdlServer->configDirty();
     	return $this->addBase('miscfile', 'miscfiles.miscfile');
     }
     
     public function delMiscFilesAction($uuid)
     {
+    	$mdlServer = new General();
+    	$mdlServer->configDirty();
     	return $this->delBase('miscfiles.miscfile',$uuid);
     }
     
     public function setMiscFilesAction($uuid)
     {
+    	$mdlServer = new General();
+    	$mdlServer->configDirty();
     	return $this->setBase('miscfile', 'miscfiles.miscfile',$uuid);
     }
     
     public function toggleMiscFilesAction($uuid)
     {
+    	$mdlServer = new General();
+    	$mdlServer->configDirty();
     	return $this->toggleBase('miscfiles.miscfile', $uuid);
     }
 }
