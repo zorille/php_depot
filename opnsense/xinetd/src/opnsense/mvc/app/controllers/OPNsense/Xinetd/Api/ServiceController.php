@@ -152,10 +152,22 @@ class ServiceController extends ApiControllerBase
                     $this->startAction();
                 }
             }
+            $mdlServer->configClean();
 
             return array("status" => "ok");
         } else {
             return array("status" => "failed");
         }
+    }
+    
+    /**
+     * Valid dirty
+     */
+    public function dirtyAction()
+    {
+    	$result = array('status' => 'ok');
+    	$mdlServer = new General();
+    	$result['xinetd']['dirty'] = $mdlServer->configChanged();
+    	return $result;
     }
 }

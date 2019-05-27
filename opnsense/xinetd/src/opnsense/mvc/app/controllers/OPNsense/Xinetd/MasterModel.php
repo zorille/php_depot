@@ -67,5 +67,31 @@ abstract class MasterModel extends BaseModel
 		$this->system_interfaces=$interfaces;
 		return $this;
 	}
-
+	
+	/**
+	 * get configuration state
+	 * @return bool
+	 */
+	public function configChanged()
+	{
+		return file_exists("/tmp/xinetd.dirty");
+	}
+	
+	/**
+	 * mark configuration as changed
+	 * @return bool
+	 */
+	public function configDirty()
+	{
+		return @touch("/tmp/xinetd.dirty");
+	}
+	
+	/**
+	 * mark configuration as consistent with the running config
+	 * @return bool
+	 */
+	public function configClean()
+	{
+		return @unlink("/tmp/xinetd.dirty");
+	}
 }

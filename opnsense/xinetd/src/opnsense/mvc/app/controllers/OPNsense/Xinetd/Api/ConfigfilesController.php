@@ -34,6 +34,7 @@ use \OPNsense\Base\ApiMutableModelControllerBase;
 use \OPNsense\Base\UIModelGrid;
 use \OPNsense\Core\Config;
 use \OPNsense\Xinetd\Configfiles;
+use \OPNsense\Xinetd\General;
 
 /**
  * Class ConfigfilesController
@@ -56,21 +57,29 @@ class ConfigfilesController extends \OPNsense\Xinetd\MasterController
     
     public function addConfigfilesAction()
     {
+    	$mdlServer = new General();
+    	$mdlServer->configDirty();
     	return $this->addBase('configfile', 'configfiles.configfile');
     }
     
     public function delConfigfilesAction($uuid)
     {
+    	$mdlServer = new General();
+    	$mdlServer->configDirty();
     	return $this->delBase('configfiles.configfile',$uuid);
     }
     
     public function setConfigfilesAction($uuid)
     {
+    	$mdlServer = new General();
+    	$mdlServer->configDirty();
     	return $this->setBase('configfile', 'configfiles.configfile',$uuid);
     }
     
     public function toggleConfigfilesAction($uuid)
     {
+    	$mdlServer = new General();
+    	$mdlServer->configDirty();
     	return $this->toggleBase('configfiles.configfile', $uuid);
     }
 }

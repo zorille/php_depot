@@ -73,6 +73,7 @@ abstract class MasterController extends ApiMutableModelControllerBase
     		$mdl->serializeToConfig();
     		
     		Config::getInstance()->save();
+    		$mdl->configDirty();
     		$result = array("result" => $message);
     	}
     	

@@ -267,6 +267,7 @@ class Configfiles extends MasterModel {
 	}
 
 	public function createConfigFiles($includeDir) {
+		exec( "/bin/rm -f " .$includeDir. "/*" );
 		foreach ( $this->configfiles->configfile->getChildren () as $alias ) {
 			$node = $alias->getNodes ();
 			//throw new \Exception ( print_r ( $node, true ) );
