@@ -123,12 +123,18 @@
                         message: data['status'],
                         draggable: true
                     });
+                    //On stoppe le pulse
+                    $("#btnApplyConfigProgress").removeClass("fa fa-spinner fa-pulse");
                 } else {
-                    ajaxCall(url="/api/sockdiops/service/reconfigure", sendData={});
+                	//On stoppe le pulse
+                	$("#btnApplyConfigProgress").removeClass("fa fa-spinner fa-pulse");
+                	//On cache le bouton
+                	$('#btnApplyConfig').blur();
+                	//On valide le nettoyage
+                	isSubsystemDirty();
+                	//On restart SockdIOPS avec perte des tunnels actifs
+                	ajaxCall(url="/api/sockdiops/service/restart", sendData={});
                 }
-                $("#btnApplyConfigProgress").removeClass("fa fa-spinner fa-pulse");
-                $('#btnApplyConfig').blur();
-                isSubsystemDirty();
             });
         });
         

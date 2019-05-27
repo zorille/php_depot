@@ -56,7 +56,7 @@ class SockslistController extends \OPNsense\SockdIOPS\GlobalController
 	
 	public function searchSockAction()
     {
-    	return $this->searchBase('socks.sock', array("rulePosition", "RuleType", "fromIp", "toIp", "toPort", "LogsType", "Protocol","clientMethod"),"rulePosition");
+    	return $this->searchBase('socks.sock', array("rulePosition", "RuleType", "fromIp", "toIp", "toPort", "LogsType", "protocol","clientMethod"),"rulePosition");
     }
     
     public function getSockAction($uuid = NULL)

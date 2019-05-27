@@ -46,9 +46,9 @@ same-same indicates the source address for a given destination should be the sam
 		<type>dropdown</type>
 	</field>
 	<field>
-		<label>DNS not used</label>
+		<label>DNS resolve Destination</label>
 		<id>sockdglobal.global.dnsresolvdst</id>
-		<help><![CDATA[Bypass DNS resolve during Socks and Routes]]></help>
+		<help><![CDATA[Force Destination's DNS resolving during Socks and Routes]]></help>
 		<type>checkbox</type>
 	</field>
 	<field>

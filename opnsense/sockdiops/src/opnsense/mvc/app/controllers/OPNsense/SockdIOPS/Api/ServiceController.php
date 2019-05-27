@@ -142,16 +142,17 @@ class ServiceController extends ApiControllerBase
 
             // generate template
             $mdlServer->generateSockdiopsConf();
+            //Rotate Template to etc/SockdIOPS conf dir
             $backend->configdRun('template reload OPNsense/SockdIOPS');
 
             // (res)start daemon
-            if ($mdlServer->global->enabled->__toString() == "1") {
-                if ($runStatus['status'] == "running" && !$force_restart) {
-                    $backend->configdRun("sockdiops reconfigure");
-                } else {
-                    $this->startAction();
-                }
-            }
+//             if ($mdlServer->global->enabled->__toString() == "1") {
+//                 if ($runStatus['status'] == "running" && !$force_restart) {
+//                     $backend->configdRun("sockdiops reconfigure");
+//                 } else {
+//                     $this->startAction();
+//                 }
+//             }
             $mdlServer->configClean();
 
             return array("status" => "ok");
