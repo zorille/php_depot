@@ -35,6 +35,40 @@ function privoxy_enabled()
     $config['OPNsense']['privoxy']['global']['enabled'] == 1;
 }
 
+function privoxy_configure()
+{
+	return array(
+			//'earlybootup'=>array(),
+			'bootup' => array('privoxy_configure_do'),
+			'newwanip'=>array('privoxy_reconfigure_do:2'),
+			//'vpn' => array('myplugin_configure_vpn:2')
+	);
+}
+
+function privoxy_configure_do($verbose = false)
+{
+	$res = configd_run('privoxy configure');
+	
+	if ($verbose) {
+		
+		printf("Privoxy configure: %s\n", trim($res));
+		
+	}
+	return;
+}
+
+function privoxy_reconfigure_do($verbose = false, $interface ='')
+{
+	$res = configd_run('privoxy reconfigure');
+	
+	if ($verbose) {
+		
+		printf("Privoxy reconfigure: %s for %s\n", trim($res),$interface);
+		
+	}
+	return;
+}
+
 function privoxy_firewall($fw)
 {
     if (!privoxy_enabled()) {
