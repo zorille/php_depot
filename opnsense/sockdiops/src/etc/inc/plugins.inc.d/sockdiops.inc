@@ -35,6 +35,40 @@ function sockdiops_enabled()
     $config['OPNsense']['sockdiops']['sockdglobal']['global']['enabled'] == 1;
 }
 
+function sockdiops_configure()
+{
+	return array(
+			//'earlybootup'=>array(),
+			'bootup' => array('sockdiops_configure_do'),
+			'newwanip'=>array('sockdiops_reconfigure_do:2'),
+			//'vpn' => array('myplugin_configure_vpn:2')
+	);
+}
+
+function sockdiops_configure_do($verbose = false)
+{
+	$res = configd_run('sockdiops configure');
+	
+	if ($verbose) {
+		
+		printf("SockdIOPS configure: %s\n", trim($res));
+		
+	}
+	return;
+}
+
+function sockdiops_reconfigure_do($verbose = false, $interface ='')
+{
+	$res = configd_run('sockdiops reconfigure');
+	
+	if ($verbose) {
+		
+		printf("SockdIOPS reconfigure: %s for %s\n", trim($res),$interface);
+		
+	}
+	return;
+}
+
 function sockdiops_firewall($fw)
 {
     if (!sockdiops_enabled()) {
@@ -82,6 +116,6 @@ function sockdiops_xmlrpc_sync()
     $result = array();
     $result['id'] = 'sockdiops';
     $result['section'] = 'OPNsense.sockdiops';
-    $result['description'] = gettext('Opnsense Package to manage SockdIOPS Systems');
+    $result['description'] = gettext('Sync SockdIOPS tool');
     return array($result);
 }

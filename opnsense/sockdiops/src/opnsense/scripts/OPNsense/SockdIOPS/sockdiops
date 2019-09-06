@@ -11,13 +11,13 @@
 # which are read from /etc/rc.conf:
 #
 # sockdiops_enable  (bool): Set to "NO" by default.
-#                         Set it to "YES" to enable Privoxy.
-# sockdiops_config   (str): Privoxy's configuration file. Default is:
-#                         /usr/local/etc/sockd/config.
-# sockdiops_flags    (str): List of additional Privoxy options you want
+#                         Set it to "YES" to enable SockdIOPS.
+# sockdiops_config   (str): SockdIOPS's configuration file. Default is:
+#                         /usr/local/etc/SockdIOPS/sockdiops.conf.
+# sockdiops_flags    (str): List of additional SockdIOPS options you want
 #                         to use. None set by default.
-# sockdiops_pidfile  (str): Default is /var/run/sockd/sockd.pid.
-# sockdiops_user     (str): Privoxy Daemon user. Default is sockd.
+# sockdiops_pidfile  (str): Default is /var/run/SockdIOPS_opnsense/sockdiops.pid.
+# sockdiops_user     (str): SockdIOPS Daemon user. Default is sockdiops.
 #
 # Usage:
 # /usr/local/etc/rc.d/sockdiops [fast|force|one](start|stop|restart|rcvar|status|poll)
