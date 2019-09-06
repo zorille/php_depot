@@ -99,7 +99,7 @@
                 if (status != "success" || data['status'] != 'ok') {
                     BootstrapDialog.show({
                         type: BootstrapDialog.TYPE_WARNING,
-                        title: "{{ lang._('Error reconfiguring SockdIOPS') }}",
+                        title: "{{ lang._('Error reconfiguring Xinetd') }}",
                         message: data['status'],
                         draggable: true
                     });
@@ -128,7 +128,7 @@
 
 <div class="alert alert-info hidden" role="alert" id="configChangedMsg">
    <button class="btn btn-primary pull-right" id="btnApplyConfig" type="button"><b>{{ lang._('Apply changes') }}</b> <i id="btnApplyConfigProgress"></i></button>
-   {{ lang._('The SockdIOPS configuration has been changed') }} <br /> {{ lang._('You must apply the changes in order for them to take effect.')}}
+   {{ lang._('The Xinetd configuration has been changed') }} <br /> {{ lang._('You must apply the changes in order for them to take effect.')}}
 </div>
 
 <ul class="nav nav-tabs" data-tabs="tabs" id="maintabs">

@@ -3,7 +3,7 @@
 if(isset($_REQUEST['list_log'])){
 	$logfile = $_REQUEST['list_log'];
 } else {
-	$logfile = '';
+	$logfile = '/var/log/xinetd.log';
 }
 $logclog = false;
 
@@ -55,18 +55,28 @@ include("fbegin.inc");
       <div class="row">
         <section class="col-xs-12">
           <p>
+            <?=html_safe(gettext('Select log file...'))?>
 			<div class="dropdown show-tick" style="width: 334px;">
 				<form method="post" name="log_form" id="log_form">
 						<select class="form-control" name="list_log" id="list_log" onChange="document.getElementById('log_form').submit()" >
-						<option value=""><?=html_safe(gettext('Select log file...'))?></option>
 <?php
-$configFileList = $config['OPNsense']['xinetd']['configfiles']['configfiles']['configfile'];
-if(isset($configFileList['logType'])){
-	$configFileList=array($configFileList);
+$configFilesDeclared = $config['OPNsense']['xinetd']['configfiles']['configfiles']['configfile'];
+$configFileList = array();
+if(isset($configFilesDeclared['logType'])){
+	$configFileList[].=$configFilesDeclared['logType'];
+} else {
+	foreach($configFilesDeclared as $configFile){
+		$configFileList[].=$configFile['logType'];
+	}
 }
+$configGeneral = $config['OPNsense']['xinetd']['general'];
+if(isset($configGeneral['logType'])){
+	$configFileList[].=$configGeneral['logType'];
+}
+$configFileList[].="FILE /var/log/xinetd.log";
 foreach ($configFileList as $configFile) {
-	if(strpos($configFile['logType'],'FILE')!==false){
-		$fichier=str_replace("FILE ", "", $configFile['logType']);
+	if(strpos($configFile,'FILE')!==false){
+		$fichier=str_replace("FILE ", "", $configFile);
 		?>
 		<option value="<?=html_safe($fichier);?>" <?=$fichier== $logfile ? "selected=\"selected\"" :"";?>>
                             <?=html_safe($fichier);?>

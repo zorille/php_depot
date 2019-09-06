@@ -7,10 +7,6 @@
 			<default>0</default>
 			<Required>Y</Required>
 		</enabled>
-		<includedir type="TextField">
-			<Required>Y</Required>
-			<default>/usr/local/etc/xinetd.d</default>
-		</includedir>
 		<instances type="IntegerField">
 			<default></default>
 			<MinimumValue>0</MinimumValue>

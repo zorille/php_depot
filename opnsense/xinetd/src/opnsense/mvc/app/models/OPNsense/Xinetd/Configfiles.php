@@ -59,7 +59,7 @@ class Configfiles extends MasterModel {
 				$flagsLine = "	flags = ";
 				foreach ( $listflags as $flag => $data ) {
 					if ($data ['selected'] == 1) {
-						$flagsLine .= $data ['value'];
+						$flagsLine .= $data ['value']." ";
 					}
 				}
 				return $flagsLine."\n";
@@ -73,7 +73,7 @@ class Configfiles extends MasterModel {
 				$typeLine = "	type = ";
 				foreach ( $listtype as $flag => $data ) {
 					if ($data ['selected'] == 1) {
-						$typeLine .= $data ['value'];
+						$typeLine .= $data ['value']." ";
 					}
 				}
 				return $typeLine."\n";
@@ -203,7 +203,7 @@ class Configfiles extends MasterModel {
 		foreach($value as $data){
 				if($data['selected']==1){
 					if(empty($logOnSuccess)){
-						$logOnSuccess='log_on_success = ';
+						$logOnSuccess='		log_on_success = ';
 					}
 					$logOnSuccess.= " ".strtoupper($data['value']);
 				}
@@ -216,7 +216,7 @@ class Configfiles extends MasterModel {
 		foreach($value as $data){
 				if($data['selected']==1){
 					if(empty($logOnFailure)){
-						$logOnFailure='log_on_failure = ';
+						$logOnFailure='		log_on_failure = ';
 					}
 					$logOnFailure.= " ".strtoupper($data['value']);
 				}

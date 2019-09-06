@@ -16,25 +16,25 @@
 				<flags type="OptionField">
 					<default></default>
 					<OptionValues>
-						<INTERCEPT>INTERCEPT</INTERCEPT>
-						<NORETRY>NORETRY</NORETRY>
 						<IDONLY>IDONLY</IDONLY>
-						<NAMEINARGS>NAMEINARGS</NAMEINARGS>
-						<NODELAY>NODELAY</NODELAY>
-						<KEEPALIVE>KEEPALIVE</KEEPALIVE>
-						<NOLIBWRAP>NOLIBWRAP</NOLIBWRAP>
-						<SENSOR>SENSOR</SENSOR>
+						<INTERCEPT>INTERCEPT</INTERCEPT>
 						<IPv4>IPv4</IPv4>
 						<IPv6>IPv6</IPv6>
+						<KEEPALIVE>KEEPALIVE</KEEPALIVE>
 						<LABELED>LABELED</LABELED>
+						<NAMEINARGS>NAMEINARGS</NAMEINARGS>
+						<NODELAY>NODELAY</NODELAY>
+						<NOLIBWRAP>NOLIBWRAP</NOLIBWRAP>
+						<NORETRY>NORETRY</NORETRY>
+						<SENSOR>SENSOR</SENSOR>
 					</OptionValues>
 					<multiple>Y</multiple>
 				</flags>
 				<type type="OptionField">
 					<default></default>
 					<OptionValues>
-						<RPC>RPC</RPC>
 						<INTERNAL>INTERNAL</INTERNAL>
+						<RPC>RPC</RPC>
 						<TCPMUX>TCPMUX/TCPMUXPLUS</TCPMUX>
 						<UNLISTED>UNLISTED</UNLISTED>
 					</OptionValues>

@@ -41,6 +41,8 @@ use OPNsense\Core\Backend;
 class General extends MasterModel
 {
 	private $xinetd_conf='/usr/local/opnsense/service/templates/OPNsense/Xinetd/xinetd.conf';
+	
+	private $xinetd_includeDir='/usr/local/etc/xinetd.d';
 
 	/**
      * check if module is enabled
@@ -108,20 +110,26 @@ class General extends MasterModel
     	return '';
     }
     
+    private function createIncludeDir(){
+    	if (!empty((string)$this->xinetd_includeDir)) {
+    		if(!is_dir((string)$this->xinetd_includeDir)){
+    			mkdir((string)$this->xinetd_includeDir,"0755",true);
+    		}
+    	}
+    	return;
+    }
+    
     private function includedirLine()
     {
-    	if (!empty((string)$this->includedir)) {
-    		if(!is_dir((string)$this->includedir)){
-    			mkdir((string)$this->includedir,"0755",true);
-    		}
-    		return 'includedir '.(string)$this->includedir;
+    	if (!empty((string)$this->xinetd_includeDir)) {
+    		return 'includedir '.(string)$this->xinetd_includeDir;
     	}
     	return '';
     }
     
     private function clientListLine(){
     	$mdlCl=new Configfiles();
-    	return $mdlCl->createConfigFiles((string)$this->includedir);
+    	return $mdlCl->createConfigFiles((string)$this->xinetd_includeDir);
     }
         
     public function generateXinetdConf() {
@@ -129,6 +137,7 @@ class General extends MasterModel
     		return $this;
     	}
     	
+    	$this->createIncludeDir();
     	$this->clientListLine();
     	
     	$xinetd_conf_file = <<< EOF

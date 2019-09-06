@@ -35,6 +35,40 @@ function xinetd_enabled()
     $config['OPNsense']['xinetd']['global']['enabled'] == 1;
 }
 
+function xinetd_configure()
+{
+	return array(
+			//'earlybootup'=>array(),
+			'bootup' => array('xinetd_configure_do'),
+			'newwanip'=>array('xinetd_reconfigure_do:2'),
+			//'vpn' => array('myplugin_configure_vpn:2')
+	);
+}
+
+function xinetd_configure_do($verbose = false)
+{
+	$res = configd_run('xinetd configure');
+	
+	if ($verbose) {
+		
+		printf("Xinetd configure: %s\n", trim($res));
+		
+	}
+	return;
+}
+
+function xinetd_reconfigure_do($verbose = false, $interface ='')
+{
+	$res = configd_run('xinetd reconfigure');
+	
+	if ($verbose) {
+		
+		printf("Xinetd reconfigure: %s for %s\n", trim($res),$interface);
+		
+	}
+	return;
+}
+
 function xinetd_firewall($fw)
 {
     if (!xinetd_enabled()) {
@@ -78,6 +112,6 @@ function xinetd_xmlrpc_sync()
     $result = array();
     $result['id'] = 'xinetd';
     $result['section'] = 'OPNsense.xinetd';
-    $result['description'] = gettext('Manage Xinetd tool');
+    $result['description'] = gettext('Sync Xinetd tool');
     return array($result);
 }

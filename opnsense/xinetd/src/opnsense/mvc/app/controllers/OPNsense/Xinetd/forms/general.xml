@@ -6,12 +6,6 @@
 		<type>checkbox</type>
 	</field>
 	<field>
-		<label>Confs Directory</label>
-		<id>general.includedir</id>
-		<help><![CDATA[The directory where the other configuration files are located.]]></help>
-		<type>text</type>
-	</field>
-	<field>
 		<label>Instances</label>
 		<id>general.instances</id>
 		<help><![CDATA[Sets the maximum number of requests xinetd can handle at once.]]></help>
