@@ -61,7 +61,6 @@ class ServiceController extends ApiControllerBase
             $this->sessionClose();
 
             $mdlServer = new ProxyDef();
-            $backend = new Backend();
 
             // generate file
             $mdlServer->generateOpnproxyConf();

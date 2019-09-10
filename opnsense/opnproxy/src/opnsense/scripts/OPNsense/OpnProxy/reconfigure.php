@@ -36,4 +36,4 @@ use \OPNsense\OpnProxy\ProxyDef;
 $mdlServer = new ProxyDef();
 
 // // generate template
-$mdlServer->generateProxyDefConf();
+$mdlServer->generateOpnproxyConf();
