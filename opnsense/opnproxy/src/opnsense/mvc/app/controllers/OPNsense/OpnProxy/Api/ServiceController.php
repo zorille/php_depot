@@ -64,8 +64,10 @@ class ServiceController extends ApiControllerBase
 
             // generate file
             $mdlServer->generateOpnproxyConf();
-
             $mdlServer->configClean();
+            
+            //restart server
+            exec("/usr/sbin/daemon -f /usr/sbin/service configd restart");
 
             return array("status" => "ok");
         } else {

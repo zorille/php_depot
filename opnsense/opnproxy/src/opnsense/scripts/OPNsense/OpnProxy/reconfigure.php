@@ -37,3 +37,4 @@ $mdlServer = new ProxyDef();
 
 // // generate template
 $mdlServer->generateOpnproxyConf();
+exec("/usr/sbin/daemon -f /usr/sbin/service configd restart");

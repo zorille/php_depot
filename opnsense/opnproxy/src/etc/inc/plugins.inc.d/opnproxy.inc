@@ -38,7 +38,7 @@ function opnproxy_enabled()
 function opnproxy_configure()
 {
 	return array(
-			'bootup' => array('opnproxy_configure_do'),
+			'earlybootup' => array('opnproxy_configure_do'),
 	);
 }
 
