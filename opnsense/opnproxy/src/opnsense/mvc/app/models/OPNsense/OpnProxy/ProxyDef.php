@@ -41,6 +41,7 @@ use OPNsense\Core\Backend;
 class ProxyDef extends GlobalModel
 {
 	private $opnproxy_conf='/usr/local/opnsense/service/conf/configd.conf';
+	private $flag_replaced=false;
 
     /**
      * check if module is enabled
@@ -52,6 +53,10 @@ class ProxyDef extends GlobalModel
             return true;
         }
         return false;
+    }
+    
+    private function create_config(){
+    	
     }
     
     private function addProxyData(&$fileData){

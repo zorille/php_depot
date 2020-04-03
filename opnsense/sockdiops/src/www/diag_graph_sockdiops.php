@@ -30,7 +30,6 @@
  */
 
 require_once("guiconfig.inc");
-require_once("services.inc");
 require_once("SockdIOPS/network.inc");
 
 $service_hook = 'sockdiops';
