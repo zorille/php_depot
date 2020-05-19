@@ -6,11 +6,17 @@
  * @package iTop
  * @subpackage extract
  */
+
 $rep_document = dirname ( $argv [0] ) . "/../..";
 /**
  * Permet d'inclure toutes les librairies communes necessaires
  */
 require_once $rep_document . "/php_framework/config.php";
+use Zorille\framework as Core;
+use Zorille\itop as itop;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use \Exception as Exception;
 
 /**
  *
@@ -27,8 +33,8 @@ function help() {
 	$help [$fichier] ["text"] [] .= "--itop_serveur";
 	
 	$class_utilisees = array ();
-	$help = array_merge ( $help, fonctions_standards::help_fonctions_standard ( false, true, $class_utilisees ) );
-	fonctions_standards::affichage_standard_help ( $help );
+	$help = array_merge ( $help, Core\fonctions_standards::help_fonctions_standard ( false, true, $class_utilisees ) );
+	Core\fonctions_standards::affichage_standard_help ( $help );
 	echo "[Exit]0\n";
 	exit ( 0 );
 }
@@ -38,7 +44,7 @@ if ($liste_option ->verifie_option_existe ( "help" ))
 	help ();
 	
 	// Le fichier de log est cree
-abstract_log::onInfo_standard ( "Heure de depart : " . date ( "d/m/Y H:i:s", time () ) );
+Core\abstract_log::onInfo_standard ( "Heure de depart : " . date ( "d/m/Y H:i:s", time () ) );
 require_once $liste_option ->getOption ( "rep_scripts" ) . '/lib/itop_liste_ci.class.php';
 
 /**
@@ -53,23 +59,23 @@ require_once $liste_option ->getOption ( "rep_scripts" ) . '/lib/itop_liste_ci.c
  */
 function principale(&$liste_option, &$fichier_log) {
 	if ($liste_option ->verifie_option_existe ( "fichier_sortie", true ) === false) {
-		return abstract_log::onError_standard ( "Il faut un --fichier_sortie" );
+		return Core\abstract_log::onError_standard ( "Il faut un --fichier_sortie" );
 	}
 	
-	abstract_log::onInfo_standard ( "fichier de sortie : " . $liste_option ->getOption ( "fichier_sortie" ) );
+	Core\abstract_log::onInfo_standard ( "fichier de sortie : " . $liste_option ->getOption ( "fichier_sortie" ) );
 	
 	if ($liste_option ->verifie_option_existe ( "itop_serveur", true ) === false) {
-		return abstract_log::onError_standard ( "Il faut un itop_serveur pour travailler." );
+		return Core\abstract_log::onError_standard ( "Il faut un itop_serveur pour travailler." );
 	}
-	$itop_webservice = itop_wsclient_rest::creer_itop_wsclient_rest ( $liste_option, itop_datas::creer_itop_datas ( $liste_option ) );
+	$itop_webservice = itop\wsclient_rest::creer_wsclient_rest ( $liste_option, itop\datas::creer_datas ( $liste_option ) );
 	
 	// Create new PHPExcel object
-	abstract_log::onInfo_standard ( "Create new PHPExcel object" );
-	$objPHPExcel = new PHPExcel ();
+	Core\abstract_log::onInfo_standard ( "Create new PHPExcel object" );
+	$objPHPExcel = new Spreadsheet ();
 	
 	if ($itop_webservice && $objPHPExcel) {
 		// Set document properties
-		abstract_log::onInfo_standard ( "Set Excel document properties" );
+		Core\abstract_log::onInfo_standard ( "Set Excel document properties" );
 		$objPHPExcel ->getProperties () 
 			->setCreator ( "Damien Vargas" ) 
 			->setLastModifiedBy ( "Damien Vargas" ) 
@@ -108,7 +114,7 @@ function principale(&$liste_option, &$fichier_log) {
 			 */
 			
 			//On se connecte a iTop
-			$liste_ci = itop_liste_ci::creer_itop_liste_ci ( $liste_option, $itop_webservice );
+			$liste_ci = itop\liste_ci::creer_liste_ci ( $liste_option, $itop_webservice );
 			$liste_ci ->recupere_VirtualMachine ( $itop_webservice ) 
 				->recupere_Server ( $itop_webservice ) 
 				->recupere_Middleware ( $itop_webservice ) 
@@ -119,11 +125,13 @@ function principale(&$liste_option, &$fichier_log) {
 				->recupere_WebApplication ( $itop_webservice ) 
 				->recupere_IPInterface ( $itop_webservice );
 			
+			$count=0;
 			foreach ( $liste_ci ->getListeCi () as $machine => $liste_cis ) {
 				$row = 1;
 				$colonne = 0;
 				$Sheet = $objPHPExcel ->createSheet () 
-					->setTitle ( substr ( $machine, 0, 31 ) );
+					->setTitle ( "n".$count++ );
+					#->setTitle ( substr ( $machine, 0, 31 ) );
 				foreach ( $liste_cis as $ci ) {
 					switch ($ci ['class']) {
 						case 'IPInterface' :
@@ -222,20 +230,21 @@ function principale(&$liste_option, &$fichier_log) {
 			}
 			
 			// Save Excel 2007 file
-			abstract_log::onInfo_standard ( "Write to Excel2007 format" );
-			$objWriter = PHPExcel_IOFactory::createWriter ( $objPHPExcel, 'Excel2007' );
+			Core\abstract_log::onInfo_standard ( "Write to Excel format" );
+			#$objWriter = PHPExcel_IOFactory::createWriter ( $objPHPExcel, 'Excel2007' );
+			$objWriter = new Xlsx($objPHPExcel);
 			$objWriter ->save ( $liste_option ->getOption ( "fichier_sortie" ) );
-			abstract_log::onInfo_standard ( "File written to " . $liste_option ->getOption ( "fichier_sortie" ) );
+			Core\abstract_log::onInfo_standard ( "File written to " . $liste_option ->getOption ( "fichier_sortie" ) );
 		} catch ( Exception $e ) {
-			return abstract_log::onError_standard ( $e ->getMessage (), "", $e ->getCode () );
+			return Core\abstract_log::onError_standard ( $e ->getMessage (), "", $e ->getCode () );
 		}
 	} else {
-		return abstract_log::onError_standard ( "Erreur dans les variables necessaires" );
+		return Core\abstract_log::onError_standard ( "Erreur dans les variables necessaires" );
 	}
 }
 
 principale ( $liste_option, $fichier_log );
-abstract_log::onInfo_standard ( "Heure de fin : " . date ( "d/m/Y H:i:s", time () ) );
+Core\abstract_log::onInfo_standard ( "Heure de fin : " . date ( "d/m/Y H:i:s", time () ) );
 
 exit ( $fichier_log ->renvoiExit () );
 ?>

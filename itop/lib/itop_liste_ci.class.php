@@ -3,6 +3,9 @@
  * Gestion de itop.
  * @author dvargas
  */
+use Zorille\framework\abstract_log as abstract_log;
+use Zorille\itop as itop;
+use \Exception as Exception;
 /**
  * class itop_liste_ci
  *
