@@ -1,0 +1,693 @@
+#! /usr/bin/perl -w
+#
+# Copyright © CoServIT 2021 – tous droits réservés.
+# Avertissement : ce logiciel est protégé par le code de la propriété intellectuelle et le droit d'auteur.
+# Toute personne ne respectant pas ces dispositions se rendra coupable du délit de contrefaçon et
+# sera passible des sanctions pénales prévues par la loi. En particulier, aucune reproduction, même
+# partielle, autres que celles prévues à l'article L 122-5 du code de la propriété intellectuelle, ne peut
+# être faite de ce logiciel sans l'autorisation expresse de l'auteur.
+# Les droits d'utilisation du logiciel sont régis par la relation contractuelle établie entre l'auteur et
+# l'utilisateur du logiciel.
+# Aucun droit d'utilisation n'est consenti par l'auteur en l'absence de relation contractuelle.
+#
+
+
+use strict;
+use warnings;
+use File::Basename;
+use DateTime;
+use JSON;
+use LWP;
+use URI;
+
+use if $] >= 5.018, feature => 'lexical_subs';
+no if $] >= 5.018, warnings => 'experimental';
+
+# Constant used to simulate boolean type in Perl.
+use constant false => 0;
+use constant true => 1;
+
+use lib dirname($0);
+
+# Coservit API
+eval {
+    require(dirname($0) . "/CoservitAPI.pm");
+} or die "Missing Coservit module";
+
+# Nagios specific
+use lib "/usr/local/nagios/libexec";
+use utils qw(%ERRORS $TIMEOUT trim);
+
+my $PROGNAME = basename($0);
+my $VERSION = '1.0.0';
+
+sub makeHeader {
+
+    my $header = $_[0];
+    my $request = $_[1];
+
+    my @headers = split(',', $header);
+    foreach (my $i = 0; $i < scalar @headers; $i++) {
+        my @element = split(":", $headers[$i]);
+        $request->header($element[0] => $element[1]);
+    }
+}
+
+sub getToken {
+    my ($ua, $subUrl, $subLogin, $subPassword) = @_ or die "Missing (User Agent, Login , Password or Url) Parametre please check";
+
+    my $req;
+    my $data;
+    my $resp;
+    my $result;
+    my $token;
+    my $errmsg;
+    my $headers = "Content-Type: application/x-www-form-urlencoded,X-Client-Version: string";
+
+    my $tokenUrl = $subUrl . "/api/v3/token";
+    $data = "grant_type=password&username=$subLogin&password=$subPassword";
+    $req = HTTP::Request->new("POST" => $tokenUrl);
+    makeHeader($headers, $req);
+
+    $req->content($data);
+    $resp = $ua->request($req);
+    verb ("Api response : ".Dumper($resp));
+
+    if (!$resp->is_success) {
+        my $codeRetour = $resp->{_rc};
+        if ($codeRetour eq '500') {
+            print "$subUrl is not reachable, please check URL and port";
+            exit($ERRORS{UNKNOWN});
+        }
+        else {
+            print "Bad credentials, please check your login and your password.";
+            exit($ERRORS{UNKNOWN});
+        }
+    }
+
+    $result = JSON::decode_json($resp->decoded_content);
+    $token = $result->{'access_token'};
+    verb(" Token : $token");
+    return $token;
+}
+
+sub getData {
+    my ($ua, $token, $subUrl, $filtre) = @_ or die "Missing (User Agent,Token or Url) Parametre please check";
+    my $req;
+    my $resp;
+    my $result;
+    my $errmsg;
+    my $headers = "accept:application/json,Authorization:Bearer $token";
+
+    my $uri = URI->new( $subUrl );
+    if($filtre){
+        $uri->query_form(limit => '500', filter => '[{"property":"status","operation":"notEquals","collation":"ignorecase","value":"Success"}]');
+    }
+    verb("Data Url : ".$uri);
+    $req = HTTP::Request->new("GET" => $uri);
+    makeHeader($headers, $req);
+    $resp = $ua->request($req);
+
+    if (!$resp->is_success) {
+        my $codeRetour = $resp->{_rc};
+        if ($codeRetour eq '500') {
+            print "$subUrl is not reachable, please check URL and port";
+            exit($ERRORS{UNKNOWN});
+        } else {
+            my $message = $resp->{_content}->{error_description};
+            print $message;
+            exit($ERRORS{UNKNOWN});
+        }
+    }
+    $result = JSON::decode_json($resp->decoded_content);
+    return $result->{data};
+}
+
+sub getRealAndConvertDate {
+
+    my $dateTime = $_[0];
+    my @dateTimeInfoZone = split(/\./, $dateTime);
+    my ($year, $mon, $day, $hour, $min, $sec) = splitDate($dateTimeInfoZone[0]);
+    $dateTimeInfoZone[1] =~ s/Z//;
+
+    my $dt = DateTime->new(
+        month      => $mon,
+        day        => $day,
+        hour       => $hour,
+        minute     => $min,
+        second     => $sec,
+        year       => $year,
+        nanosecond => $dateTimeInfoZone[1]
+    );
+
+    $dt = $dt->epoch;
+    return $dt;
+}
+
+sub splitDate {
+
+    my $dateTime = $_[0];
+    my @dateTimeResult = split("T", $dateTime);
+    my ($year, $mon, $day) = split('-', $dateTimeResult[0]);
+    my ($hour, $min, $sec) = split(':', $dateTimeResult[1]);
+    return ($year, $mon, $day, $hour, $min, $sec);
+}
+
+sub convertPeriodToSeconds {
+
+    my $period = $_[0];
+    my ($d, $h, $m) = split(/[djhm]/i, $period);
+    my $timestamp = ($d * 24 * 3600) + ($h * 3600) + ($m * 60);
+    return $timestamp;
+
+}
+
+sub newFormatDate {
+
+    my $date = $_[0];
+    my $dateNewFormat;
+    my ($year, $mon, $day, $hour, $min, $sec) = splitDate($date);
+    my @seconds = split('\.',$sec);
+    $dateNewFormat = $year . "-" . $mon . "-" . $day . ", " . $hour . ":" . $min . ":" . $seconds[0];
+    return $dateNewFormat;
+}
+
+sub convertData {
+
+    my $transferredDataUnits = $_[0];
+    my $transferredData = $_[1];
+
+    if ($transferredDataUnits eq 'B') {
+        $transferredData = $transferredData / 1024 / 1024 / 1024;
+    }
+    elsif ($transferredDataUnits eq 'MB') {
+        $transferredData = $transferredData / 1024 / 1024;
+    }
+    elsif ($transferredDataUnits eq 'TB') {
+        $transferredData = $transferredData * 1024;
+    }
+    return $transferredData;
+}
+
+sub showErrorMessage {
+
+    my $s_warning = $_[0];
+    my $s_critical = $_[1];
+    my $type = $_[2];
+
+    if (defined($s_warning) && !defined($s_critical)) {
+        print "There is not the critical $type threshold, but there is the warning one. Please fill the critical $type threshold or remove the warning one";
+        exit $ERRORS{'UNKNOWN'};
+    }
+    elsif (defined($s_critical) && !defined($s_warning)) {
+        print "There is not the warning $type threshold, but there is the critical one. Please fill the warning $type threshold or remove the critical one.";
+        exit $ERRORS{'UNKNOWN'};
+    }
+}
+
+my $np = Coservit::PluginBox->new(
+    {
+        name        => $PROGNAME,
+        version     => $VERSION,
+        copyright   => "Copyright (c) Coservit 2021",
+        subject     => "Monitor the status, and possibly runtime, last launch date, and data volume of one or more Veeam Jobs in one or more companies via the Veeam Service Provider Console v3 API. ",
+        description => "Monitor the status, and possibly runtime, last launch date, and data volume of one or more Veeam Jobs in one or more companies via the Veeam Service Provider Console v3 API.  <strong>Configuration : <strong/> API URL, login and password, jobs names, companies names"
+    }
+);
+
+$np->addOption({
+    key      => 'H',
+    label    => 'Host',
+    type     => 1,
+    required => 0,
+});
+
+$np->addOption({
+    key         => 'url',
+    label       => 'URL',
+    description => 'URL to call the VSCP API.',
+    context     => 19,
+    type        => 1,
+    required    => 1,
+    sample      => 'https://myserver.mydomain.fr'
+});
+
+$np->addOption({
+    key         => 'port',
+    label       => 'PORT',
+    description => 'Port of the call to the VSCP API.',
+    context     => 19,
+    type        => 10,
+    required    => 0,
+    sample      => '1281'
+});
+
+$np->addOption({
+    key         => 'login',
+    label       => 'Login',
+    description => 'VSCP API connection identifier.',
+    context     => 19,
+    type        => 2,
+    required    => 1,
+    sample      => 'domain\login'
+});
+
+$np->addOption({
+    key         => 'password',
+    label       => 'Password',
+    description => 'VVSCP API login password.',
+    context     => 19,
+    type        => 3,
+    required    => 1,
+    sample      => 'Azertyui22@!!'
+});
+
+$np->addOption({
+    key         => 'whitelist',
+    label       => 'Whitelist - Jobs',
+    description => 'List of job names that will be supervised. If a white list is filled in, all jobs out of this list are ignored. Values are separated by a comma.',
+    type        => 1,
+    required    => 0,
+    sample      => 'name1, name2'
+});
+
+$np->addOption({
+    key         => 'blacklist',
+    label       => 'Blacklist - Jobs',
+    description => 'List of job names that will not be supervised. If a black list is filled in, all jobs except those on this list will be taken into account.If a white list is filled in, this argument is ignored. Values are separated by a comma.',
+    type        => 1,
+    required    => 0,
+    sample      => 'name3, name4'
+});
+
+$np->addOption({
+    key         => 'companyWhitelist',
+    label       => 'Companies whitelist',
+    description => 'List of the names of companies whose jobs will be supervised. If a white list of companies is filled in, all jobs whose parent company is not in this list are ignored.Values are separated by a comma.',
+    type        => 1,
+    required    => 0,
+    sample      => 'Company A,Company B'
+});
+
+$np->addOption({
+    key         => 'companyBlacklist',
+    label       => 'Companies blacklist',
+    description => 'List of the names of companies whose jobs will not be supervised.If a black list of companies is filled in, all jobs are supervised except those whose parent company is in this list. Values are separated by a comma.',
+    type        => 1,
+    required    => 0,
+    sample      => 'Company C,Company D'
+});
+
+$np->addOption({
+    key         => 'wDuration',
+    label       => 'Duration warning threshold',
+    description => 'Generates an alert status if the job execution time exceeds this threshold, in minutes.Supports thresholds in Nagios format.',
+    type        => 22,
+    required    => 0,
+    sample      => '60'
+});
+
+$np->addOption({
+    key         => 'cDuration',
+    label       => 'Duration critical threshold',
+    description => 'Generates a critical status if the job execution time exceeds this threshold, in minutes.Supports thresholds in Nagios format',
+    type        => 22,
+    required    => 0,
+    sample      => '90'
+});
+
+$np->addOption({
+    key         => 'wLastRun',
+    label       => 'LastRun warning threshold',
+    description => 'Generates an alert status if the last job execution is older than the specified period.Format \'XXdYYYhZZm\' or \'XXjYYhZZm\'',
+    type        => 14,
+    required    => 0,
+    sample      => '01d00h00m'
+});
+
+$np->addOption({
+    key         => 'cLastRun',
+    label       => 'LastRun critical threshold',
+    description => 'Generates a critical status if the last job execution is older than the specified period.Format \'XXdYYYhZZm\' or \'XXjYYhZZm\'.',
+    type        => 14,
+    required    => 0,
+    sample      => '01d00h00m'
+});
+
+$np->addOption({
+    key         => 'wVolume',
+    label       => 'Volume warning threshold',
+    description => 'Generates an alert status if the volume of data transferred by a job exceeds this threshold, in Go. Supports thresholds in Nagios format.',
+    type        => 22,
+    required    => 0,
+    sample      => '2.5'
+});
+
+$np->addOption({
+    key         => 'cVolume',
+    label       => 'Volume critical threshold',
+    description => 'Generates a critical status if the volume of data transferred by a job exceeds this threshold, in Go. Supports thresholds in Nagios format.',
+    type        => 22,
+    required    => 0,
+    sample      => '4'
+});
+
+$np->checkOptions();
+
+my $login     = $np->getValue('login');
+my $password  = $np->getValue('password');
+my $url       = $np->getValue('url');
+my $port      = $np->getValue('port');
+my $whitelist = $np->getValue('whitelist');
+my $blacklist = $np->getValue('blacklist');
+my $wDuration = $np->getValue('wDuration');
+my $cDuration = $np->getValue('cDuration');
+my $wLastRun  = $np->getValue('wLastRun');
+my $cLastRun  = $np->getValue('cLastRun');
+my $timeout   = $np->getValue('timeout');
+$timeout = $timeout / 3 ;
+
+if (defined($wLastRun) && $wLastRun ne '' && defined($cLastRun) && $cLastRun ne '') {
+    $wLastRun = convertPeriodToSeconds($wLastRun);
+    $cLastRun = convertPeriodToSeconds($cLastRun);
+}
+
+my $wVolume = $np->getValue('wVolume');
+my $cVolume = $np->getValue('cVolume');
+
+showErrorMessage($wDuration, $cDuration, "duration");
+showErrorMessage($wLastRun, $cLastRun, "lastrun");
+showErrorMessage($wVolume, $cVolume, "volume");
+
+my $companyWhitelist = $np->getValue('companyWhitelist');
+my $companyBlacklist = $np->getValue('companyBlacklist');
+
+my %outputHash = (
+    $ERRORS{'OK'}       => '',
+    $ERRORS{'WARNING'}  => '',
+    $ERRORS{'CRITICAL'} => '',
+    $ERRORS{'UNKNOWN'}  => ''
+);
+
+my @arrCompanyWhite;
+my $isCompanyWhitelist = false;
+
+my @arrCompanyBlack;
+my $isCompanyBlacklist = false;
+my $counterForCompanies = 0;
+
+if (defined($companyWhitelist) && $companyWhitelist ne '') {
+    @arrCompanyWhite = split(',', $companyWhitelist);
+    $isCompanyWhitelist = true;
+}
+
+if (defined($companyBlacklist) && $companyBlacklist ne '') {
+    @arrCompanyBlack = split(',', $companyBlacklist);
+    $isCompanyBlacklist = true;
+}
+
+my @arrWhite;
+my $isWhitelist = false;
+
+my @arrBlack;
+my $isBlacklist = false;
+my $counterForJobs = 0;
+
+if (defined($whitelist) && $whitelist ne '') {
+    @arrWhite = split(',', $whitelist);
+    $isWhitelist = true;
+}
+
+if (defined($blacklist) && $blacklist ne '') {
+    @arrBlack = split(',', $blacklist);
+    $isBlacklist = true;
+}
+
+if ($url !~ /^https?:\/\/(?:[A-Z0-9](?:[A-Z0-9-_]{0,62}[A-Z0-9])?\.){1,8}[A-Z0-9]{1,63}(?:\:[0-9]{1,6})?\/?$/i) {
+    print "Authentication URL Incorrect - Please check";
+    exit $ERRORS{'UNKNOWN'};
+}
+
+if (defined($port) && $port ne '') {
+    $url = $url . ':' . $port;
+}
+
+my $token;
+my $result;
+my $cacheId = $url . "_" . $login;
+$cacheId =~ s/\//_/g;
+
+my $uniqueId = "check_vspc_api_jobs_" . $cacheId;
+my $tokenFileCache = "/usr/local/nagios/libexec/tmp/" . $uniqueId . "token";
+my $semaphore;
+my %tokenInfoHash;
+
+my $isValidCacheToken = true;
+my $lastUpdateTime;
+my $nowTimestamp = time;
+my $difference;
+
+my $ua = LWP::UserAgent->new;
+$ua->ssl_opts(verify_hostname => 0);
+$ua->timeout($timeout);
+
+if (-e $tokenFileCache) {
+    $lastUpdateTime = (stat($tokenFileCache))[9];
+    $difference = ($nowTimestamp - $lastUpdateTime);
+    if ($difference < 3600) {
+        $semaphore = $np->getSemaphore($uniqueId);
+        %tokenInfoHash = $np->getHashInformationsStoredInFile($uniqueId);
+        $token = $tokenInfoHash{'token'};
+        $np->releaseSemaphore($semaphore);
+    }
+    else {
+        $isValidCacheToken = false;
+    }
+}
+else {
+    $isValidCacheToken = false;
+}
+
+if ($isValidCacheToken == 0) {
+    $token = getToken($ua, $url, $login, $password);
+    $tokenInfoHash{'token'} = $token;
+    $semaphore = $np->getSemaphore($uniqueId);
+    $np->storeHashInformationsInFile($uniqueId, %tokenInfoHash);
+    $np->releaseSemaphore($semaphore);
+}
+
+my $urlForCompanies = $url . "/api/v3/organizations";
+$result = getData($ua, $token, $urlForCompanies, false);
+
+my @data = @{$result};
+my @listOfCompanies = ();
+my @companiesId = ();
+my @notExistCompany = ();
+
+foreach my $dt (@data) {
+    push(@listOfCompanies, $dt->{name});
+    if ($isCompanyWhitelist) {
+        if (!($dt->{name} ~~ @arrCompanyWhite)) {
+            next;
+        }
+    }
+    elsif ($isCompanyBlacklist) {
+        if ($dt->{name} ~~ @arrCompanyBlack) {
+            $counterForCompanies++;
+            next;
+        }
+    }
+    push(@companiesId, $dt->{instanceUid});
+}
+
+foreach my $row (@arrCompanyWhite) {
+    if (!($row ~~ @listOfCompanies)) {
+        push(@notExistCompany, $row);
+    }
+}
+
+if ($counterForCompanies == scalar @data) {
+    print "None of the values match with the lists. Please check the companyBlacklist.";
+    exit $ERRORS{'UNKNOWN'};
+
+}
+
+if (scalar @notExistCompany > 0) {
+    my $message = "the companies ";
+    $message .= join(',', @notExistCompany);
+    $message .= " was not found. Please check the companyWhitelist";
+    print $message;
+    exit $ERRORS{'UNKNOWN'};
+}
+
+my $urlForJobs = $url . "/api/v3/infrastructure/backupServers/jobs";
+$result = getData($ua, $token, $urlForJobs, true);
+my @dataJobs = @{$result};
+my @notExistJobs = ();
+my @listOfJobs = ();
+
+my $durationStatus = $ERRORS{'OK'};
+my $lastRunStatus = $ERRORS{'OK'};
+my $volumeStatus = $ERRORS{'OK'};
+my $output = "Everything is OK";
+my $status = $ERRORS{'OK'};
+
+my $duration;
+my $lastRun;
+my $transferredDataUnits;
+my $transferredData;
+my $newDateFormat;
+my $perfData = "";
+
+my $isUnk = false; 
+my $outputCrit = "";
+my $outputWarn = "";
+my $counter = 0;
+
+foreach my $job (@dataJobs) {
+
+    push(@listOfJobs, $job->{name});
+    my $jobName = $job->{name};
+    my $jobStatus = $job->{status};
+
+    if (!($job->{organizationUid} ~~ @companiesId)) {
+        next;
+    }
+
+    if ($isWhitelist) {
+        if (!($jobName ~~ @arrWhite)) {
+            next;
+        }
+    }
+    elsif ($isBlacklist) {
+        if (($jobName ~~ @arrBlack)) {
+            $counterForJobs++;
+            next;
+        }
+    }
+
+    $counter++;
+
+    if ($jobStatus eq "Failed") {
+        $outputHash{$ERRORS{'CRITICAL'}} .= "<strong> status = $jobStatus (CRITICAL) </strong>";
+    }
+    elsif ($jobStatus eq "Warning") {
+        $outputHash{$ERRORS{'WARNING'}} .= "status = $jobStatus (WARNING) ";
+    }
+    elsif ($jobStatus eq "No info") {
+        $outputHash{$ERRORS{'UNKNOWN'}} .= "status = $jobStatus (UNKNOWN) \n";
+        $isUnk = true;
+    }
+    
+    my $jobPerf = $jobName;
+    $jobPerf =~ s/\'//g;
+    $jobPerf =~ s/\s/_/g;
+
+    if (defined($job->{duration}) && $job->{duration} ne '') {
+        $duration = $job->{duration} / 60;
+        $durationStatus = $np->getStatus($duration, $wDuration, $cDuration);
+
+        if ($durationStatus == $ERRORS{'CRITICAL'}) {
+            $outputHash{$ERRORS{'CRITICAL'}} .= "<strong> duration = " . sprintf('%.2f', $duration) . "min (CRITICAL) </strong>";
+        } elsif ($durationStatus == $ERRORS{'WARNING'}) {
+            $outputHash{$ERRORS{'WARNING'}} .= "duration = " . sprintf('%.2f', $duration) . "min (WARNING)";
+        }
+
+        if(!$isUnk) { 
+            my $perfStringDuration = $np->getThresholdPerfString($wDuration, $cDuration);
+            $perfData .= " '" . $jobPerf . "_duree'=" . sprintf('%.2f', $duration) . "min" . $perfStringDuration;
+        }
+
+    }
+
+    if (defined($wLastRun) && $wLastRun ne '' && defined($cLastRun) && $cLastRun ne '') {
+        if (defined($job->{lastRun}) && $job->{lastRun} ne '') {
+            $lastRun = getRealAndConvertDate($job->{lastRun});
+            $lastRun = $nowTimestamp - $lastRun;
+            $lastRunStatus = $np->getStatus($lastRun, $wLastRun, $cLastRun);
+            $newDateFormat = newFormatDate($job->{lastRun});
+
+            if ($lastRunStatus == $ERRORS{'CRITICAL'}) {
+                $outputHash{$ERRORS{'CRITICAL'}} .= "<strong>lastRun : $newDateFormat (CRITICAL) </strong>";
+            } elsif ($lastRunStatus == $ERRORS{'WARNING'}) {
+                $outputHash{$ERRORS{'WARNING'}} .= "lastRun : $newDateFormat (WARNING)";
+            }
+            
+            if(!$isUnk) { 
+                my $perfStringLastRun = $np->getThresholdPerfString($wLastRun, $cLastRun);
+                $perfData .= " '" . $jobPerf . "_lastrun'=" . $lastRun . "s" .$perfStringLastRun." ";
+            }
+
+        }
+    }
+
+    if (defined($job->{transferredDataUnits}) && $job->{transferredDataUnits} ne '' && defined($job->{transferredData}) && $job->{transferredData} ne '') {
+        $transferredDataUnits = $job->{transferredDataUnits};
+        $transferredData = $job->{transferredData};
+        $transferredData = convertData($transferredDataUnits, $transferredData);
+        $volumeStatus = $np->getStatus($transferredData, $wVolume, $cVolume);
+
+        if ($volumeStatus == $ERRORS{'CRITICAL'}) {
+            $outputHash{$ERRORS{'CRITICAL'}} .= "<strong> transfferedData  = $transferredData Go (CRITICAL) </strong>";
+        } elsif ($volumeStatus == $ERRORS{'WARNING'}) {
+            $outputHash{$ERRORS{'WARNING'}} .= "transfferedData = $transferredData Go (WARNING)";
+        }
+        
+        if(!$isUnk) { 
+            my $perfStringVolume = $np->getThresholdPerfString($wVolume, $cVolume);
+            $perfData .= " '" . $jobPerf . "_volume'=" . $transferredData . "GB" . $perfStringVolume;
+        }
+
+    }
+
+    if ($outputHash{$ERRORS{'CRITICAL'}} ne '') {
+        $outputCrit .= "Job $jobName : " . $outputHash{$ERRORS{'CRITICAL'}} . "\n";
+    }
+    elsif ($outputHash{$ERRORS{'WARNING'}} ne '') {
+        $outputWarn .= "Job $jobName : " . $outputHash{$ERRORS{'WARNING'}} . "\n";
+    }
+
+    $outputHash{$ERRORS{'CRITICAL'}} = "";
+    $outputHash{$ERRORS{'WARNING'}} = "";
+    
+    $isUnk = false;
+
+}
+
+foreach my $row (@arrWhite) {
+    if (!($row ~~ @listOfJobs)) {
+        push(@notExistJobs, $row);
+    }
+}
+
+if ($counterForJobs == scalar @dataJobs) {
+    print "None of the values match with the lists. Please check the blacklist.";
+    exit $ERRORS{'UNKNOWN'};
+
+}
+
+if($counter == 0 ) {
+    print "No row found. Please check your whitelist and blacklist for the companies and the jobs";
+    exit $ERRORS{'UNKNOWN'};
+}
+
+
+if (scalar @notExistJobs > 0) {
+    my $message = "The jobs ";
+    $message .= join(',', @notExistJobs);
+    $message .= " was not found. Please check the whitelist";
+    print $message;
+    exit $ERRORS{'UNKNOWN'};
+}
+
+if ($outputCrit ne '') {
+    $status = $ERRORS{'CRITICAL'};
+    $output = $outputCrit . $outputWarn . $outputHash{$ERRORS{'UNKNOWN'}};
+}
+elsif ($outputWarn ne '') {
+    $status = $ERRORS{'WARNING'};
+    $output = $outputWarn . $outputHash{$ERRORS{'UNKNOWN'}};
+}
+
+print $output . "|" . $perfData;
+exit($status);

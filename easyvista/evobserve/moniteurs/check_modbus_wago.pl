@@ -1,0 +1,314 @@
+#!/usr/bin/perl -w
+#
+# Copyright © Zorille – tous droits réservés.
+# Avertissement : ce logiciel est protégé par le code de la propriété intellectuelle et le droit d’auteur.
+# Toute personne ne respectant pas ces dispositions se rendra coupable du délit de contrefaçon et 
+# sera passible des sanctions pénales prévues par la loi. En particulier, aucune reproduction, même 
+# partielle, autres que celles prévues à l'article L 122-5 du code de la propriété intellectuelle, ne peut
+# être faite de ce logiciel sans l'autorisation expresse de l'auteur.
+# Les droits d’utilisation du logiciel sont régis par la relation contractuelle établie entre l’auteur et 
+# l’utilisateur du logiciel.
+# Aucun droit d’utilisation n’est consenti par l’auteur en l’absence de relation contractuelle.
+#
+
+# Generic SNMP Check with customs output label and perfdata label
+
+use strict;
+use File::Basename;
+use Data::Dumper;
+use Scalar::Util qw(looks_like_number);
+
+# Librairy for ModBus
+use Protocol::Modbus;
+
+# Coservit API
+eval {
+        require(dirname($0)."/CoservitSNMPAPI.pm");
+} or die "Missing Coservit module";
+
+# Nagios libraries
+use lib "/usr/local/nagios/libexec";
+use utils qw(%ERRORS $TIMEOUT affectation_code_retour trim);
+
+# Parameters
+use vars qw/$o_oid $o_outputLabel $o_perfdata $o_perfdataLabel $o_warning $o_critical $o_lowWarning $o_highWarning $o_lowCritical $o_highCritical $o_treshold $o_unit $o_insideRange/;
+
+# Constant
+my $PROGNAME = basename($0);
+my $VERSION = '1.0.0';
+
+# New Coservit Plug
+my $np = Coservit::PluginBox->new(
+        {
+                name => $PROGNAME,
+                version => $VERSION,
+                copyright => "Copyright (c) Zorille",
+                subject => "Collecte du ModBus sur des Wago.",
+                description => ""
+        }
+);
+
+$np->addOption({
+        key                     => 'O',
+        altkey          => 'oid',
+        label           => 'oid',
+        type            => 1, #Undefined
+        description => "ModBus ID to collecte",
+        required        => 1
+});
+
+$np->addOption({
+        key                     => 'w',
+        altkey          => 'warning',
+        label           => 'warning',
+        type            => 1, #Undefined
+        description => "Warning treshold",
+        required        => 0
+});
+
+$np->addOption({
+        key                     => 'c',
+        altkey          => 'critical',
+        label           => 'critical',
+        type            => 1, #Undefined
+        description => "Critical treshold",
+        required        => 0
+});
+
+$np->addOption({
+        key                     => 'u',
+        altkey          => 'unit',
+        label           => 'unit',
+        type            => 1, #Undefined
+        description => "Output, perfdata and treshold unit",
+        required        => 0
+});
+
+$np->addOption({
+        key                     => 'o',
+        altkey          => 'outputLabel',
+        label           => 'outputLabel',
+        type            => 1, #Undefined
+        description => "output Label to display (default 'Value')",
+        required        => 0
+});
+
+$np->addOption({
+        key                     => 'f',
+        altkey          => 'perdata',
+        label           => 'perfdataLabel',
+        type            => 1, #Undefined
+        description => "perfdata label to display. If no perfdata label defined, no perfdata will be returned",
+        required        => 1
+});
+
+$np->addOption({
+        key                     => 'd',
+        altkey          => 'diviseur',
+        label           => 'Diviseur',
+        type            => 1, #Undefined
+        description => "Diviseur pour impulsion, doit etre compris entre les valeurs 1,100 ou 1000",
+        required        => 1
+});
+
+# Constant
+$o_insideRange = 0;
+
+$np->checkOptions();
+
+check_options();
+
+# Récupération des arguments
+my $o_host = $np->getValue('H');
+my $o_oid = $np->getValue('O');
+my $o_divise = $np->getValue('d');
+
+if ($o_oid>210) {
+   printf("ERROR: %s.\n", "Oid superieur a 200");
+   exit($ERRORS{'CRITICAL'});
+}
+
+# Output 
+my $output = $o_outputLabel;
+my $status = $ERRORS{'OK'};
+my $perfdata = '';
+my $tresholdPerfdata = '';
+
+# Préparation de la connexion ModBus
+my $modbus = Protocol::Modbus->new(driver=>'TCP', transport=>'TCP');
+my $trs = Protocol::Modbus::Transport->new(driver => 'TCP',address => $o_host,port => 502, timeout => 3,);
+if (!$trs) {
+   printf("ERROR: %s.\n", "Unable to connect ".$o_host);
+   exit($ERRORS{'UNKNOWN'});
+}
+
+my $address = 12256;
+my $requested = $address+($o_oid*32);
+#printf("ADDRESS %s.\n", $requested);
+my $req = $modbus->readCoilsRequest(address => $requested,quantity => 32,);
+my $trn = $modbus->transaction($trs, $req);
+my $res = $trn->execute();
+my $coils = $res->coils();
+my $binval = join('', @$coils);
+my $rbinval = reverse($binval);
+#Converti en decimal
+my $snmpValue = bin2dec($rbinval);
+ 
+if(!defined($snmpValue) || $snmpValue eq 'noSuchObject') {
+        print 'No data found';
+        exit $ERRORS{'UNKNOWN'};
+}
+
+$snmpValue = $snmpValue/$o_divise;
+$output .= ' = '.$snmpValue.' '.$o_unit;
+
+# Comparaison with defined treshold
+if (defined($o_treshold)) {
+        $tresholdPerfdata = ';'.$o_warning.';'.$o_critical;
+
+        # If we test outside the range
+        if ($o_insideRange != 2) {
+                if( (defined($o_lowCritical) && $snmpValue < $o_lowCritical ) || (defined($o_highCritical) && $snmpValue > $o_highCritical )) {
+                        $output = 'CRITICAL - '.$output;
+                        $status = affectation_code_retour($status,$ERRORS{'CRITICAL'});
+                }
+                elsif( (defined($o_lowWarning) && $snmpValue < $o_lowWarning ) || (defined($o_highWarning) && $snmpValue > $o_highWarning)) {
+                        $output = 'WARNING - '.$output;
+                        $status = affectation_code_retour($status,$ERRORS{'WARNING'});
+                }
+        }
+        # If we test inside the range
+        else {
+                if(!((defined($o_lowCritical) && $snmpValue < $o_lowCritical ) || (defined($o_highCritical) && $snmpValue > $o_highCritical ))) {
+                        $output = 'CRITICAL - '.$output;
+                        $status = affectation_code_retour($status,$ERRORS{'CRITICAL'});
+                }
+                elsif(!((defined($o_lowWarning) && $snmpValue < $o_lowWarning ) || (defined($o_highWarning) && $snmpValue > $o_highWarning))) {
+                        $output = 'WARNING - '.$output;
+                        $status = affectation_code_retour($status,$ERRORS{'WARNING'});
+                }
+        }
+}
+
+# Add perfdata if defined
+if (defined($o_perfdata)) {
+        $perfdata = ' | '.$o_perfdataLabel.'='.$snmpValue.$o_unit.$tresholdPerfdata;
+}
+
+print $output.$perfdata;
+exit $status;
+
+# FONCTIONS
+sub check_options {
+
+    $o_oid = $np->getValue('O');
+    $o_warning = $np->getValue('w');
+    $o_critical = $np->getValue('c');
+    $o_unit = $np->getValue('u');
+    $o_outputLabel = $np->getValue('o');
+    $o_perfdataLabel = $np->getValue('f');
+
+        # default Value
+        if(!defined($o_outputLabel) || trim($o_outputLabel) eq '' ) { $o_outputLabel = 'Value'; }
+        else { $o_outputLabel = trim($o_outputLabel); }
+
+        if(!defined($o_unit) ) { $o_unit = ''; }
+
+        # If both treshold are entered
+        if(defined($o_warning) && defined($o_critical) && trim($o_warning) ne '' & trim($o_critical) ne '') {
+                # accepted Format : 00 - 00:00 - 00: - :00 - @00:00
+                if($o_warning =~ m/^(\@\d+:\d+|\d+:{0,1}\d*|\d*:{0,1}\d+)$/ ) {
+                        if(looks_like_number($o_warning) || $o_warning =~ m/^:/) { $o_warning =~ s/:// ; $o_highWarning = $o_warning;}
+                        elsif($o_warning =~ m/:$/ ) {
+                                $o_lowWarning = $o_warning; 
+                                $o_lowWarning =~ s/://;
+                        }
+                        else {
+                                my $warningRange = $o_warning;
+                                # if treshold begin with '@', so the test has to be done inside the range (and not outside)
+                                if ( $warningRange =~ m/^\@/) { $o_insideRange += 1 ; $warningRange =~ s/^\@//; }
+                                my @tabWarning = split(':',$warningRange);
+                                $o_lowWarning = $tabWarning[0];
+                                $o_highWarning = $tabWarning[1];
+                        }
+                }
+                else {print 'Warning treshold is in a wrong format'; exit $ERRORS{'CRITICAL'};}
+
+                # accepted Format : 00 - 00:00 - 00: - :00 - @00:00
+                if($o_critical =~ m/^(\@\d+:\d+|\d+:{0,1}\d*|\d*:{0,1}\d+)$/ ) {
+                        if(looks_like_number($o_critical) || $o_critical =~ m/^:/) { $o_critical =~ s/:// ; $o_highCritical = $o_critical; }
+                        elsif($o_critical =~ m/:$/ ) {
+                                $o_lowCritical = $o_critical; 
+                                $o_lowCritical =~ s/://;
+                        }
+                        else {
+                                my $criticalRange = $o_critical;
+                                # if treshold begin with '@', so the test has to be done inside the range (and not outside)
+                                if ($criticalRange =~ m/^\@/) { $o_insideRange += 1 ; $criticalRange =~ s/^\@// ; }
+                                my @tabCritical = split(':', $criticalRange);
+                                $o_lowCritical = $tabCritical[0];
+                                $o_highCritical = $tabCritical[1];
+                        }
+                }
+                else {print 'Critical treshold is in a wrong format'; exit $ERRORS{'CRITICAL'};}
+
+                # the treshold must have the same format. The two treshold must have either the @, either none
+                if($o_insideRange == 1)  {
+                        print 'Warning and critical treshold must have the same format (with @ or not)';
+                        exit $ERRORS{'CRITICAL'};
+                }
+
+                if($o_insideRange != 2) {
+                        if(defined($o_lowCritical) && defined($o_lowWarning) && ($o_lowCritical > $o_lowWarning)) {
+                                print 'Wrong value for tresholds';
+                                exit $ERRORS{'CRITICAL'};
+                        }
+                        if(defined($o_highCritical) && defined($o_highWarning) && ($o_highCritical < $o_highWarning)) {
+                                print 'Wrong value for tresholds';
+                                exit $ERRORS{'CRITICAL'};
+                        }
+                }else{
+                        if(defined($o_lowCritical) && defined($o_lowWarning) && ($o_lowCritical < $o_lowWarning)) {
+                                print 'Wrong value for tresholds';
+                                exit $ERRORS{'CRITICAL'};
+                        }
+                        if(defined($o_highCritical) && defined($o_highWarning) && ($o_highCritical > $o_highWarning)) {
+                                print 'Wrong value for tresholds';
+                                exit $ERRORS{'CRITICAL'};
+                        }
+                }
+
+                $o_treshold = 1;
+        }
+
+        if(defined($o_perfdataLabel) && trim($o_perfdataLabel) ne '') {
+                $o_perfdata = 1;
+                # replace space by underscore and lowercase
+                $o_perfdataLabel = trim ($o_perfdataLabel);
+                $o_perfdataLabel = lc($o_perfdataLabel);
+        }
+}
+
+sub bin2dec
+    {
+    my ($str) = @_;
+    my $ret = "";
+    $ret = mul2($ret, $_) 
+    foreach split(//, $str);
+    return $ret;
+    }
+
+sub mul2
+    {
+    my ($str, $add_one_f) = @_;
+    defined($add_one_f) or $add_one_f = 0;
+    my $ret = "";
+    foreach (my $i = length($str) - 1; $i >= 0; --$i)
+        {
+        my $c = substr($str, $i, 1) * 2;
+        $c += 1 if ($add_one_f);
+        $ret = ($c % 10) . $ret;
+        $add_one_f = ($c >= 10);
+        }
+    return $add_one_f ? '1' . $ret : $ret;
+    }
